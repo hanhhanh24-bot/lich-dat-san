@@ -147,7 +147,82 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .band .who{font-size:12.5px;color:var(--band-dim);align-self:center}
 .mrow{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:8px;align-items:center;margin-bottom:8px}
 .mrow b,.mrow span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mrow span{font-size:12.5px;color:var(--ink-2)}
-</style>
+/* Thu gọn thanh đầu trang */
+.band .band-in {
+  min-height: 68px;
+  padding-block: 10px;
+  gap: 8px 16px;
+}
+
+.band .brand {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  text-align: left;
+}
+
+.band .brand::before {
+  content: "⚽";
+  font-size: 20px;
+}
+
+.band .brand h1 {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 30px);
+  letter-spacing: .03em;
+  background: none;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  filter: none;
+}
+
+.band .kicker,
+.band .hbar {
+  display: none;
+}
+
+.band .datecur {
+  min-width: 0;
+}
+
+.band .datecur .big {
+  font-size: 21px;
+}
+
+.band .actions {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.band #addBtn {
+  background: #218653;
+  border-color: #218653;
+  color: #fff;
+}
+
+/* Dành thêm chỗ cho bảng lịch trên máy tính */
+@media (min-width: 1040px) {
+  .main {
+    grid-template-columns: 150px minmax(0, 1fr) 220px;
+    gap: 12px;
+  }
+
+  .gscroll {
+    max-height: 78vh;
+  }
+}
+
+@media (max-width: 700px) {
+  .band .brand {
+    flex-basis: 100%;
+  }
+
+  .band .actions {
+    margin-left: 0;
+  }
+} </style>
 <!-- CẤU HÌNH KẾT NỐI: dán Project URL và anon public key của dự án Supabase vào 2 dòng dưới -->
 <script>window.APP_CONFIG={url:'https://qoynnpeytdkcfaedubbk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveW5ucGV5dGRrY2ZhZWR1YmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzY1MDIsImV4cCI6MjEwOTY1MjUwMn0.227EyiIsShCwmTfVVQmTbaZMNw3rBpMAe_gTv0o5dng'};</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
