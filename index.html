@@ -145,7 +145,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .yn-ms{display:flex;flex-direction:column;gap:2px;padding:2px 0 6px 6px}.yn-y em,.yn-m em{font-style:normal;font-size:11.5px;opacity:.75}
 @media(max-width:1039px){.ynav{position:static}.yn-ms{flex-direction:row;flex-wrap:wrap}.yn-m{width:auto;gap:8px}}
 .band .who{font-size:12.5px;color:var(--band-dim);align-self:center}
-.mrow{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:8px;align-items:center;margin-bottom:8px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;margin-bottom:8px}
+.mrow [data-edit-fields]{grid-column:1/-1;display:grid;gap:8px;min-width:0}.mrow [data-edit-actions]{display:flex;gap:8px;flex-wrap:wrap}
 .mrow b,.mrow span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mrow span{font-size:12.5px;color:var(--ink-2)}
 /* Thu gọn thanh đầu trang */
 .band .band-in {
@@ -273,8 +274,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f">Ngày<input class="inp" id="fDate" type="date"></label>
 <label class="f">Giờ bắt đầu<select class="inp" id="fStart"></select></label>
 <label class="f">Giờ kết thúc<select class="inp" id="fEnd"></select></label>
-<div class="f span2"><span>Thời lượng</span><div class="chips" id="durChips">
-<button type="button" class="chip" data-dur="90" aria-pressed="false">90 phút</button><span class="dur" id="durText"></span></div></div>
+<div class="f span2"><span>Thời lượng</span><output class="dur" id="durText" for="fStart fEnd"></output></div>
 <label class="f">Tiền sân (đồng)<input class="inp num" id="fPrice" type="text" inputmode="numeric"></label>
 <label class="f">Trạng thái<select class="inp" id="fStatus"></select></label>
 <label class="f span2">Trọng tài<select class="inp" id="fRef"><option value="0">Không</option><option value="1">Có</option></select></label>
@@ -513,7 +513,10 @@ function setDate(s,ns){if(!s)return;state.selected=s;renderAll();if(!ns)scrollGr
 var form={id:null,priceTouched:false,delStage:0,groupId:null,created:null};
 function timeOpts(from,to,cur){var h='',seen=false;for(var m=from;m<=to;m+=30){h+='<option value="'+m+'"'+(m===cur?' selected':'')+'>'+fmtMin(m)+'</option>';if(m===cur)seen=true}if(!seen&&cur!=null)h+='<option value="'+cur+'" selected>'+fmtMin(cur)+'</option>';return h}
 function curPrice(){var p=pitchById($('#fPitch').value),m=Number($('#fEnd').value)-Number($('#fStart').value);return p&&m>0?Math.round(p.price*m/60):0}
-function syncDur(){var m=Number($('#fEnd').value)-Number($('#fStart').value);$('#durText').textContent=m>0?'= '+durText(m):'Giờ kết thúc phải sau giờ bắt đầu';document.querySelectorAll('#durChips .chip').forEach(function(c){c.setAttribute('aria-pressed',String(Number(c.dataset.dur)===m))})}
+function syncDur(){
+  var minutes=Number($('#fEnd').value)-Number($('#fStart').value);
+  $('#durText').textContent=minutes>0?durText(minutes):'Giờ kết thúc phải sau giờ bắt đầu';
+}
 function syncRemain(){fmtInputs();var price=digits($('#fPrice').value),st=$('#fStatus').value,dep=digits($('#fDeposit').value),got=st==='paid'?price:st==='deposit'?Math.min(dep,price):0,left=st==='cancelled'?0:price-got;$('#fRemain').innerHTML='<span>Đã thu <b>'+money(got)+'</b></span><span>Còn phải thu <b>'+money(left)+'</b></span>';$('#fDepositWrap').hidden=st!=='deposit'}
 function autoPrice(){if(form.priceTouched)return;$('#fPrice').value=curPrice();syncRemain()}
 function renderDel(){
@@ -690,7 +693,6 @@ $('#bkForm').onsubmit=saveBooking;
 $('#fPitch').onchange=autoPrice;
 $('#fStart').onchange=function(){var s=Number($('#fStart').value),e=Number($('#fEnd').value);if(e<=s)$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(s+90,state.close));syncDur();autoPrice()};
 $('#fEnd').onchange=function(){syncDur();autoPrice()};
-$('#durChips').onclick=function(e){var c=e.target.closest('.chip');if(!c)return;$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(Number($('#fStart').value)+Number(c.dataset.dur),state.close));syncDur();autoPrice()};
 $('#fPrice').oninput=function(){form.priceTouched=true;syncRemain()};
 $('#fDeposit').oninput=syncRemain;
 $('#fStatus').onchange=function(){if($('#fStatus').value==='deposit'&&!digits($('#fDeposit').value))$('#fDeposit').value=Math.round(digits($('#fPrice').value)*0.3/10000)*10000||'';syncRemain()};
@@ -827,9 +829,13 @@ $('#aSignup').onclick=async function(){
 async function loadMembers(){
   var r=chk(await sb.from('members').select('*').order('created_at')),h='';
   r.data.forEach(function(m){var self=m.email===me.email;
-    h+='<div class="mrow"><div><b>'+esc(m.full_name||m.email)+(self?' (bạn)':'')+'</b><span>'+esc(m.email)+'</span></div><select class="inp" data-role-of="'+esc(m.email)+'"'+(self?' disabled':'')+'>'
-      +Object.keys(ROLE).map(function(k){return '<option value="'+k+'"'+(k===m.role?' selected':'')+'>'+ROLE[k]+'</option>'}).join('')+'</select>'
-      +'<button type="button" class="btn sm danger" data-mdel="'+esc(m.email)+'"'+(self?' disabled':'')+'>Xoá</button></div>'});
+    h+='<div class="mrow" data-member="'+esc(m.email)+'"><div><b>'+esc(m.full_name||m.email)+(self?' (bạn)':'')+'</b><span>'+esc(m.email)+' · '+esc(ROLE[m.role])+'</span></div>'
+      +'<button type="button" class="btn sm" data-medit>Sửa</button>'
+      +'<button type="button" class="btn sm danger" data-mdel="'+esc(m.email)+'"'+(self?' disabled':'')+'>Xoá</button>'
+      +'<div data-edit-fields hidden><label class="f">Họ tên<input class="inp" data-member-name value="'+esc(m.full_name||'')+'"></label>'
+      +'<label class="f">Vai trò<select class="inp" data-member-role'+(self?' disabled':'')+'>'
+      +Object.keys(ROLE).map(function(k){return '<option value="'+k+'"'+(k===m.role?' selected':'')+'>'+ROLE[k]+'</option>'}).join('')+'</select></label>'
+      +'<div data-edit-actions><button type="button" class="btn sm primary" data-msave>Lưu</button><button type="button" class="btn sm" data-mcancel>Bỏ qua</button></div></div></div>'});
   $('#mbList').innerHTML=h;
 }
 $('#membersBtn').onclick=async function(){$('#mMsg').hidden=true;$('#mbOverlay').hidden=false;try{await loadMembers()}catch(err){showMsg($('#mMsg'),err.message)}};
@@ -838,8 +844,48 @@ $('#mAdd').onclick=async function(){
   try{chk(await sb.from('members').insert({email:em,full_name:$('#mName').value.trim(),role:$('#mRole').value}));$('#mEmail').value='';$('#mName').value='';$('#mMsg').hidden=true;await loadMembers();toast('Đã thêm thành viên.')}
   catch(err){showMsg($('#mMsg'),/duplicate/i.test(err.message)?'Email này đã có trong danh sách.':err.message)}
 };
-$('#mbList').onchange=async function(e){var em=e.target.dataset.roleOf;if(!em)return;try{chk(await sb.from('members').update({role:e.target.value}).eq('email',em));toast('Đã đổi vai trò.')}catch(err){showMsg($('#mMsg'),err.message);loadMembers()}};
-$('#mbList').onclick=async function(e){var b=e.target.closest('[data-mdel]');if(!b)return;if(!confirm('Xoá '+b.dataset.mdel+' khỏi danh sách thành viên?'))return;try{chk(await sb.from('members').delete().eq('email',b.dataset.mdel));await loadMembers()}catch(err){showMsg($('#mMsg'),err.message)}};
+$('#mbList').onclick=async function(e){
+  var button=e.target.closest('button');
+  var row=button&&button.closest('[data-member]');
+  if(!row||!state.admin)return;
+  var email=row.dataset.member,self=email===me.email;
+  var fields=row.querySelector('[data-edit-fields]');
+  $('#mMsg').hidden=true;
+  if(button.hasAttribute('data-medit')){
+    fields.hidden=false;
+    fields.querySelector('[data-member-name]').focus();
+    return;
+  }
+  if(button.hasAttribute('data-mcancel')){
+    var nameInput=fields.querySelector('[data-member-name]');
+    var roleInput=fields.querySelector('[data-member-role]');
+    nameInput.value=nameInput.defaultValue;
+    roleInput.selectedIndex=Array.from(roleInput.options).findIndex(function(o){return o.defaultSelected});
+    fields.hidden=true;
+    return;
+  }
+  button.disabled=true;
+  try{
+    if(button.hasAttribute('data-msave')){
+      var name=fields.querySelector('[data-member-name]').value.trim();
+      if(!name)return showMsg($('#mMsg'),'Nhập họ tên thành viên.');
+      var changes={full_name:name};
+      if(!self)changes.role=fields.querySelector('[data-member-role]').value;
+      var result=chk(await sb.from('members').update(changes).eq('email',email).select('full_name,role').single());
+      if(self){
+        me.full_name=result.data.full_name;
+        $('#whoami').textContent=me.full_name+' · '+ROLE[me.role];
+      }
+      await loadMembers();
+      toast('Đã lưu thông tin thành viên.');
+    }else if(button.hasAttribute('data-mdel')&&!self&&confirm('Xoá '+email+' khỏi danh sách thành viên?')){
+      chk(await sb.from('members').delete().eq('email',email));
+      await loadMembers();
+    }
+  }catch(err){showMsg($('#mMsg'),err.message)}
+  finally{button.disabled=false}
+};
+
 
 (async function boot(){
   var cfg=window.APP_CONFIG||{};
