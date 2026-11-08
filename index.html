@@ -280,10 +280,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f span2">Trọng tài<select class="inp" id="fRef"><option value="0">Không</option><option value="1">Có</option></select></label>
 <label class="f span2" id="fDepositWrap" hidden>Tiền đã cọc (đồng)<input class="inp num" id="fDeposit" type="text" inputmode="numeric"></label>
 <label class="f span2" id="fRepeatWrap">Khách đá cố định<select class="inp" id="fRepeat"><option value="0">Chỉ một buổi</option><option value="3">Lặp lại hàng tuần, 4 tuần liên tiếp</option><option value="7">Lặp lại hàng tuần, 8 tuần liên tiếp</option><option value="11">Lặp lại hàng tuần, 12 tuần liên tiếp</option><option value="25">Lặp lại hàng tuần, 26 tuần liên tiếp</option></select></label>
-<div class="f span2" id="bookingAudit" hidden><div>Người nhập lịch — <strong id="bookingCreator"></strong></div><div>Người sửa gần nhất — <strong id="bookingEditor"></strong></div></div>
 <label class="f span2">Ghi chú<input class="inp" id="fNote" type="text" placeholder="Thuê áo bib, nước, trọng tài…"></label>
 </div><div class="remain" id="fRemain"></div>
-<p class="hint"><b>Quy tắc đặt sân:</b> Sân 7 và Sân 5 không được đặt trùng giờ. Sân 5 được đặt tối đa 3 sân cùng một khung giờ.</p><p class="msg" id="fMsg" role="alert" hidden></p></div>
+<div class="f span2" id="bookingAudit" hidden><div>Note: <strong id="bookingCreator"></strong></div><div id="bookingEditorLine" hidden>Chỉnh sửa: <strong id="bookingEditor"></strong></div></div>
+<p class="msg" id="fMsg" role="alert" hidden></p></div>
 <div class="mfoot"><div id="delArea" class="chips"></div><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="submit" class="btn primary" id="saveBtn">Lưu lượt đặt</button></div>
 </form></div></div>
 
@@ -522,12 +522,26 @@ function renderDel(){
   if(form.delStage===0){a.innerHTML=($('#fStatus').value!=='cancelled'?'<button type="button" class="btn" data-del="cancel">Huỷ lịch</button>':'')+'<button type="button" class="btn danger" data-del="1">Xoá lượt đặt</button>';return}
   a.innerHTML='<button type="button" class="btn danger armed" data-del="2">Bấm lại để xoá</button>'+(later?'<button type="button" class="btn danger" data-del="series">Xoá cả '+later+' tuần sau</button>':'');
 }
+var bookingAuditRequest=0;
+async function loadBookingNames(booking,request){
+  var names=null;
+  try{
+    var result=await sb.rpc('booking_actor_names',{booking_id:booking.id}).maybeSingle();
+    if(!result.error)names=result.data;
+  }catch(e){}
+  if(request!==bookingAuditRequest)return;
+  $('#bookingCreator').textContent=names&&names.creator_name||(booking.createdBy?(names?'Chưa có tên thành viên':'Chưa tải được tên'):'Chưa ghi nhận');
+  $('#bookingEditor').textContent=names&&names.editor_name||(booking.updatedBy?(names?'Chưa có tên thành viên':'Chưa tải được tên'):'Chưa ghi nhận');
+}
 function openForm(o){
   o=o||{};if(!canEdit()){toast('Bạn chưa có quyền sửa sổ này.');return}
   var b=o.id?bookingById(o.id):null;
   $('#bookingAudit').hidden=!b;
-  $('#bookingCreator').textContent=b&&b.createdBy||'Chưa ghi nhận';
-  $('#bookingEditor').textContent=b&&b.updatedBy||'Chưa ghi nhận';
+  $('#bookingEditorLine').hidden=!(b&&b.updatedBy);
+  $('#bookingCreator').textContent=b&&b.createdBy?'Đang tải tên…':'Chưa ghi nhận';
+  $('#bookingEditor').textContent=b&&b.updatedBy?'Đang tải tên…':'Chưa ghi nhận';
+  var auditRequest=++bookingAuditRequest;
+  if(b) loadBookingNames(b,auditRequest);
   form={id:b?b.id:null,priceTouched:!!b,delStage:0,groupId:b?b.groupId||null:null,created:b?b.createdAt||null:null};
   $('#bkTitle').textContent=b?'Sửa lượt đặt':'Đặt sân mới';$('#saveBtn').textContent=b?'Lưu thay đổi':'Lưu lượt đặt';$('#fMsg').hidden=true;
   var def=b||{date:o.date||state.selected,pitch:o.pitch||(state.pitches[0]&&state.pitches[0].id),start:o.start!=null?o.start:Math.min(Math.max(state.open,1080),state.close-90),end:null,name:'',phone:'',price:0,deposit:0,status:'pending',note:''};
