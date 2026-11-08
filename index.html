@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Đăng Khoa Sport - Sổ đặt sân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#F1F4EE;--surface:#fff;--surface-2:#E7EDE4;--ink:#13241A;--ink-2:#506257;--line:#D3DCD0;--line-soft:#E8EDE5;--prime:rgba(27,107,69,.045);
+--band:#0E3B26;--band-ink:#E9F3EA;--band-dim:#9CC0A9;--turf:#1B6B45;--turf-ink:#fff;--turf-soft:#DDEBDD;
+--pending-bg:#FBEBC6;--pending-fg:#6A4600;--deposit-bg:#D9E7F8;--deposit-fg:#12407A;--paid-bg:#CDE8D5;--paid-fg:#0E4B2B;--cancel-bg:#E5E6E1;--cancel-fg:#6B726C;
+--danger:#B3261E;--danger-soft:#FBE3E0;--now:#E5484D;--focus:#1B6B45;--shadow:0 1px 2px rgba(19,36,26,.06),0 8px 24px rgba(19,36,26,.08);
+--fd:'Barlow Condensed','Arial Narrow',Impact,sans-serif;--fb:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--gut:54px}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0D1812;--surface:#15251B;--surface-2:#1C3024;--ink:#E6EFE6;--ink-2:#9DB2A3;--line:#2B4234;--line-soft:#213529;--prime:rgba(92,197,138,.05);--band:#0A2217;--band-dim:#85AD93;--turf:#5CC58A;--turf-ink:#07140C;--turf-soft:#1E3A2A;--pending-bg:#4A3A12;--pending-fg:#F2D58A;--deposit-bg:#173352;--deposit-fg:#A9CCF2;--paid-bg:#17432C;--paid-fg:#9ADDB5;--cancel-bg:#272D29;--cancel-fg:#8A948D;--danger:#F08A82;--danger-soft:#43201D;--now:#FF6B70;--focus:#5CC58A;--shadow:0 8px 24px rgba(0,0,0,.35)}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0D1812;--surface:#15251B;--surface-2:#1C3024;--ink:#E6EFE6;--ink-2:#9DB2A3;--line:#2B4234;--line-soft:#213529;--prime:rgba(92,197,138,.05);--band:#0A2217;--band-dim:#85AD93;--turf:#5CC58A;--turf-ink:#07140C;--turf-soft:#1E3A2A;--pending-bg:#4A3A12;--pending-fg:#F2D58A;--deposit-bg:#173352;--deposit-fg:#A9CCF2;--paid-bg:#17432C;--paid-fg:#9ADDB5;--cancel-bg:#272D29;--cancel-fg:#8A948D;--danger:#F08A82;--danger-soft:#43201D;--now:#FF6B70;--focus:#5CC58A;--shadow:0 8px 24px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--fb);-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:none;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px))}
+.num{font-variant-numeric:tabular-nums}
+.band{position:relative;background:var(--band);color:var(--band-ink);overflow:hidden}
+.band-art{position:absolute;right:-30px;top:0;height:100%;width:520px;max-width:70%;opacity:.13;pointer-events:none}
+.band-in{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;padding-block:20px}
+.brand{min-width:0;flex:1 1 100%;text-align:center;padding-top:4px}
+.kicker{font:600 12px/1 var(--fb);letter-spacing:.14em;text-transform:uppercase;color:var(--band-dim)}
+.brand h1{margin:8px 0 0;font:700 clamp(40px,9vw,84px)/1 var(--fd);letter-spacing:.08em;text-transform:uppercase;overflow-wrap:anywhere;background:linear-gradient(180deg,#fff 35%,#8FE0B0 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))}.hbar{width:96px;height:4px;margin:12px auto 4px;border-radius:2px;background:#6EDC9A}
+.datenav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.datecur{display:flex;flex-direction:column;align-items:center;min-width:150px}
+.datecur .big{font:600 26px/1.05 var(--fd);white-space:nowrap}.datecur .sub{font-size:12px;color:var(--band-dim)}
+.band .btn{background:transparent;border-color:rgba(233,243,234,.3);color:var(--band-ink)}
+.band .btn:hover:not(:disabled){background:rgba(233,243,234,.1)}
+.band .btn.chalk{background:var(--band-ink);color:var(--band);border-color:var(--band-ink)}
+.band input[type=date]{background:transparent;border:1px solid rgba(233,243,234,.3);color:var(--band-ink);border-radius:9px;padding:7px 9px;color-scheme:dark;width:140px}
+.actions{display:flex;gap:8px;margin-left:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-weight:600;line-height:1.2;min-height:38px}
+.btn:hover:not(:disabled){background:var(--surface-2)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}.btn.primary:hover:not(:disabled){background:var(--turf);filter:brightness(1.08)}
+.btn.danger{color:var(--danger);border-color:var(--danger)}.btn.danger.armed{background:var(--danger);color:#fff}
+.btn.sm{padding:5px 10px;min-height:30px;font-size:12.5px}.btn.icon{width:38px;padding:0;font-size:20px}
+.inp{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font-size:15px;min-height:42px}.inp:focus{border-color:var(--turf)}
+#banners{display:flex;flex-direction:column;gap:8px;padding-top:14px}#banners:empty{display:none}
+.banner{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 14px;border-radius:10px;background:var(--turf-soft);font-size:13.5px}
+.banner.warn{background:var(--pending-bg);color:var(--pending-fg)}.banner span{flex:1 1 240px;min-width:0}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding-top:16px}
+.wd{display:flex;flex-direction:column;align-items:center;padding:8px 2px 7px;border:1px solid var(--line);border-radius:11px;background:var(--surface);min-width:0;position:relative}
+.wd:hover{background:var(--surface-2)}.wd .dw{font-size:11.5px;font-weight:600;color:var(--ink-2)}.wd .dn{font:600 24px/1.1 var(--fd)}.wd .dc{font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.wd.sel{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}.wd.sel .dw,.wd.sel .dc{color:var(--turf-ink);opacity:.85}
+.wd.today::after{content:"";position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--now)}
+.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.led{padding:14px 18px;border-left:1px solid var(--line);min-width:0}.led:first-child{border-left:0}
+.led .lb{font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+.led .v{font:600 36px/1.05 var(--fd);margin-top:4px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.led .v small{font-size:18px;font-weight:500;margin-left:2px;color:var(--ink-2)}
+.led .sb{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--turf)}
+@media(max-width:640px){.led{border-left:0;border-top:1px solid var(--line)}.led:first-child{border-top:0}}
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;padding-bottom:40px}
+@media(min-width:1040px){.main{grid-template-columns:190px minmax(0,1fr) 300px}}
+.sch-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-bottom:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:7px;font-weight:600;font-size:13.5px;color:var(--ink-2)}
+.seg button[aria-pressed=true]{background:var(--turf);color:var(--turf-ink)}.seg.small button{padding:5px 11px;font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--ink-2);margin-left:auto}.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}.hint{margin:8px 2px 0;font-size:12.5px;color:var(--ink-2)}
+.gscroll{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:min(74vh,760px);overscroll-behavior:contain}
+.gtable{display:grid;grid-template-columns:var(--gut) repeat(var(--n,7),minmax(112px,1fr));min-width:100%}
+.gh{position:sticky;top:0;z-index:4;background:var(--surface);border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:9px 10px 8px;min-width:0}
+.gh b{display:block;font:600 19px/1.1 var(--fd);letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gh span{display:block;font-size:11.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcorner{left:0;z-index:6;border-left:0}
+.ggut{position:sticky;left:0;z-index:3;background:var(--surface);border-right:1px solid var(--line)}
+.gt{position:absolute;right:7px;font-size:11.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;transform:translateY(-50%)}
+.gcol{position:relative;border-left:1px solid var(--line);cursor:cell;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(var(--line-soft) 1px,transparent 1px);background-size:100% 56px,100% 28px}
+.prime{position:absolute;left:0;right:0;background:var(--prime);pointer-events:none}
+.bk{position:absolute;display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;border-radius:8px;padding:4px 8px;overflow:hidden;font-size:12.5px;line-height:1.3;z-index:2}
+.bk:hover{filter:brightness(.97);box-shadow:var(--shadow)}
+.bk-t{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bk-m,.bk-p{font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.9}
+.bk-s{margin-top:auto;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.8}
+.s-pending{background:var(--pending-bg);color:var(--pending-fg)}.s-deposit{background:var(--deposit-bg);color:var(--deposit-fg)}.s-paid{background:var(--paid-bg);color:var(--paid-fg)}.s-cancelled{background:var(--cancel-bg);color:var(--cancel-fg)}
+.now{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--now);z-index:3;pointer-events:none}
+.nowdot{position:absolute;right:-1px;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:var(--now);z-index:4}
+.empty{padding:34px 20px;text-align:center;color:var(--ink-2);background:var(--surface);border:1px dashed var(--line);border-radius:12px}.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.lrows{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.lrow{display:grid;grid-template-columns:92px minmax(0,1.4fr) minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer}
+.lrow:first-child{border-top:0}.lrow:hover{background:var(--surface-2)}
+.lrow .t{font:600 20px/1.1 var(--fd)}.lrow .t small{display:block;font:400 12px var(--fb);color:var(--ink-2)}
+.lrow .who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lrow .who span,.lrow .mny span{font-size:12.5px;color:var(--ink-2)}.lrow .mny b{display:block}
+.lrow.is-cancelled .who b,.lrow.is-cancelled .mny b{text-decoration:line-through;color:var(--ink-2)}
+.lact{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+@media(max-width:640px){.lrow{grid-template-columns:76px minmax(0,1fr)}.lrow .mny,.lrow .lact{grid-column:2}.lact{justify-content:flex-start}}
+.side{display:flex;flex-direction:column;gap:10px;min-width:0}.side .inp{min-height:40px}
+.sidebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sidehead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sidehead .tot{font-size:12.5px;color:var(--ink-2)}.sidehead .tot b{color:var(--ink)}
+.srow{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:10px 12px;border:0;border-top:1px solid var(--line-soft);background:transparent;text-align:left}
+.srow:hover{background:var(--surface-2)}.srow .st b{display:block;font:600 19px/1.1 var(--fd)}.srow .st span{font-size:11.5px;color:var(--ink-2)}
+.srow .sm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.srow .sm span{font-size:12.5px;color:var(--ink-2);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sempty{padding:22px 14px;text-align:center;color:var(--ink-2);font-size:13px}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(8,18,12,.58);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+.modal{width:100%;max-width:580px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);margin:auto 0}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}.mhead h2{margin:0;font:700 26px/1.1 var(--fd);letter-spacing:.03em;text-transform:uppercase}
+.x{border:0;background:transparent;font-size:26px;line-height:1;width:38px;height:38px;border-radius:9px;color:var(--ink-2)}.x:hover{background:var(--surface-2)}
+.mbody{padding:8px 20px 6px}.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12.5px;font-weight:600;color:var(--ink-2)}.f .inp{font-weight:400;color:var(--ink)}.span2{grid-column:1/-1}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:600;font-size:13px;min-height:34px}.chip:hover{background:var(--surface-2)}
+.chip[aria-pressed=true]{background:var(--turf-soft);border-color:var(--turf)}.dur{font-size:13px;color:var(--ink-2);font-weight:500}
+.msg{margin:12px 0 0;padding:9px 12px;border-radius:9px;background:var(--danger-soft);color:var(--danger);font-size:13px}
+.remain{margin:12px 0 0;padding:10px 12px;border-radius:9px;background:var(--surface-2);font-size:13px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px}
+.mfoot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px 20px 18px}.grow{flex:1}
+.prow,.plabel{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px}
+.plabel{font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
+@media(max-width:520px){.prow{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}.prow .pn{grid-column:1/-1}.plabel{display:none}.datecur .big{font-size:20px}.datecur{min-width:0}.wd .dc{display:none}.actions{margin-left:0;width:100%}.actions .btn{flex:1}}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:80;max-width:min(92vw,520px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow)}
+.gh.today{background:var(--turf-soft)}.gh.today b{color:var(--turf)}
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mh{background:var(--surface-2);padding:8px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--ink-2)}
+.mc{background:var(--surface);min-height:84px;padding:6px 6px 8px;text-align:left;border:0;display:flex;flex-direction:column;gap:2px;min-width:0}
+button.mc:hover{background:var(--surface-2)}.mc.out{background:var(--bg);color:var(--ink-2)}.mc .md{font:600 18px/1 var(--fd)}.mc.today .md{color:var(--now)}.mc.sel{box-shadow:inset 0 0 0 2px var(--turf)}
+.mc .mn{font-size:12px;font-weight:600;color:var(--turf)}.mc .mr{font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.lday{padding:8px 14px;background:var(--surface-2);font-size:12.5px;font-weight:600;color:var(--ink-2);border-top:1px solid var(--line)}.lday:first-child{border-top:0}
+@media(max-width:520px){.mc{min-height:64px}.mc .mr{display:none}}
+
+:root{--k7-bg:#CFE2FA;--k7-fg:#0F3F7A;--k5-bg:#FFE7A0;--k5-fg:#5C4200;--ball:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%27-105%20-105%20210%20210%27%3E%3Cdefs%3E%3CclipPath%20id%3D%27c%27%3E%3Ccircle%20r%3D%27100%27/%3E%3C/clipPath%3E%3C/defs%3E%3Cg%20clip-path%3D%27url%28%23c%29%27%20stroke%3D%27%233E8E63%27%20stroke-width%3D%273%27%20stroke-linejoin%3D%27round%27%20fill%3D%27none%27%3E%3Ccircle%20r%3D%27100%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%270.0%2C-32.0%2030.4%2C-9.9%2018.8%2C25.9%20-18.8%2C25.9%20-30.4%2C-9.9%27/%3E%3Cline%20x1%3D%270.0%27%20y1%3D%27-32.0%27%20x2%3D%270.0%27%20y2%3D%27-66.0%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%270.0%2C-64.0%20-32.3%2C-87.5%20-20.0%2C-125.5%2020.0%2C-125.5%2032.3%2C-87.5%27/%3E%3Cline%20x1%3D%2730.4%27%20y1%3D%27-9.9%27%20x2%3D%2762.8%27%20y2%3D%27-20.4%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%2760.9%2C-19.8%2073.2%2C-57.8%20113.2%2C-57.8%20125.5%2C-19.8%2093.2%2C3.7%27/%3E%3Cline%20x1%3D%2718.8%27%20y1%3D%2725.9%27%20x2%3D%2738.8%27%20y2%3D%2753.4%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%2737.6%2C51.8%2077.6%2C51.8%2089.9%2C89.8%2057.6%2C113.3%2025.3%2C89.8%27/%3E%3Cline%20x1%3D%27-18.8%27%20y1%3D%2725.9%27%20x2%3D%27-38.8%27%20y2%3D%2753.4%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%27-37.6%2C51.8%20-25.3%2C89.8%20-57.6%2C113.3%20-89.9%2C89.8%20-77.6%2C51.8%27/%3E%3Cline%20x1%3D%27-30.4%27%20y1%3D%27-9.9%27%20x2%3D%27-62.8%27%20y2%3D%27-20.4%27/%3E%3Cpolygon%20fill%3D%27%233E8E63%27%20points%3D%27-60.9%2C-19.8%20-93.2%2C3.7%20-125.5%2C-19.8%20-113.2%2C-57.8%20-73.2%2C-57.8%27/%3E%3Cpolygon%20points%3D%270.0%2C-66.0%2062.8%2C-20.4%2038.8%2C53.4%20-38.8%2C53.4%20-62.8%2C-20.4%27/%3E%3C/g%3E%3C/svg%3E")}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--k7-bg:#1A3F6E;--k7-fg:#BBD6F7;--k5-bg:#5A4510;--k5-fg:#F5DC8E}}
+:root[data-theme=dark]{--k7-bg:#1A3F6E;--k7-fg:#BBD6F7;--k5-bg:#5A4510;--k5-fg:#F5DC8E}
+body{background-color:var(--bg);background-image:repeating-linear-gradient(90deg,rgba(27,107,69,.04) 0 90px,transparent 90px 180px)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.12;background:var(--ball) no-repeat right -70px bottom -50px/520px,var(--ball) no-repeat left -120px top 36%/380px}
+.ledger,.sidebox,.gscroll,.lrows{background:color-mix(in srgb,var(--surface) 90%,transparent)}
+.bk.k7{background:var(--k7-bg);color:var(--k7-fg)}.bk.k5{background:var(--k5-bg);color:var(--k5-fg)}
+.bk.s-pending{border-left:4px solid #F08C00}.bk.s-deposit{border-left:4px solid #8E44CC}.bk.s-paid{border-left:4px solid #1E9E5A}
+.bk.s-cancelled{background:var(--cancel-bg);color:var(--cancel-fg);border-left:4px dashed #98A19B;opacity:.8}
+.bk.s-cancelled .bk-t,.bk.s-cancelled .bk-m,.bk.s-cancelled .bk-p{text-decoration:line-through}
+.dot.k7{background:var(--k7-bg);border:1px solid var(--k7-fg)}.dot.k5{background:var(--k5-bg);border:1px solid var(--k5-fg)}.dot.kx{background:var(--line)}
+.sd-pending{background:#F08C00}.sd-deposit{background:#8E44CC}.sd-paid{background:#1E9E5A}.sd-cancelled{background:#98A19B}
+.pfilter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}.pf-l{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.ynav{position:sticky;top:12px;align-self:start;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:12px;padding:10px 8px}
+.yn-title{font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);padding:2px 8px 8px}
+.yn-y,.yn-m{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:transparent;text-align:left;border-radius:8px;padding:7px 10px}
+.yn-y{font:600 18px var(--fd);letter-spacing:.03em;margin-top:4px}.yn-m{font-size:13.5px;font-weight:500;color:var(--ink-2)}
+.yn-y:hover,.yn-m:hover{background:var(--surface-2)}.yn-m.on{background:var(--turf);color:var(--turf-ink)}
+.yn-ms{display:flex;flex-direction:column;gap:2px;padding:2px 0 6px 6px}.yn-y em,.yn-m em{font-style:normal;font-size:11.5px;opacity:.75}
+@media(max-width:1039px){.ynav{position:static}.yn-ms{flex-direction:row;flex-wrap:wrap}.yn-m{width:auto;gap:8px}}
+.band .who{font-size:12.5px;color:var(--band-dim);align-self:center}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:8px;align-items:center;margin-bottom:8px}
+.mrow b,.mrow span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mrow span{font-size:12.5px;color:var(--ink-2)}
+</style>
+<!-- CẤU HÌNH KẾT NỐI: dán Project URL và anon public key của dự án Supabase vào 2 dòng dưới -->
+<script>window.APP_CONFIG={url:'https://qoynnpeytdkcfaedubbk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveW5ucGV5dGRrY2ZhZWR1YmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzY1MDIsImV4cCI6MjEwOTY1MjUwMn0.227EyiIsShCwmTfVVQmTbaZMNw3rBpMAe_gTv0o5dng'};</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head><body>
+<header class="band">
+<svg class="band-art" viewBox="0 0 520 130" preserveAspectRatio="xMaxYMid slice" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="12" y="12" width="496" height="106"/><line x1="260" y1="12" x2="260" y2="118"/><circle cx="260" cy="65" r="26"/><rect x="12" y="35" width="52" height="60"/><rect x="456" y="35" width="52" height="60"/><path d="M64 52A18 18 0 0 1 64 78"/><path d="M456 52A18 18 0 0 0 456 78"/></svg>
+<div class="wrap band-in">
+<div class="brand"><div class="kicker">⚽ Sổ đặt sân</div><h1 id="venueName">ĐĂNG KHOA SPORT</h1><div class="hbar"></div></div>
+<div class="datenav"><button class="btn icon" id="prevDay" type="button" aria-label="Ngày trước">‹</button>
+<div class="datecur"><span class="big" id="dateBig"></span><span class="sub" id="dateSub"></span></div>
+<button class="btn icon" id="nextDay" type="button" aria-label="Ngày sau">›</button>
+<button class="btn" id="todayBtn" type="button">Hôm nay</button>
+<input type="date" id="datePick" aria-label="Chọn ngày"></div>
+<div class="actions"><span class="who" id="whoami"></span><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
+</div></header>
+<div class="wrap">
+<div id="banners"></div>
+
+<section class="ledger" id="kpis" aria-label="Số liệu trong ngày"></section>
+<div class="main">
+<nav class="ynav" id="ynav" aria-label="Lọc theo năm và tháng"></nav>
+<section>
+<div class="sch-head">
+<div class="seg" id="viewSeg" role="group" aria-label="Kiểu xem"><button type="button" data-view="grid" aria-pressed="true">Lịch sân</button><button type="button" data-view="list" aria-pressed="false">Danh sách</button></div>
+<div class="seg" id="rangeSeg" role="group" aria-label="Lọc theo tuần hoặc tháng"><button type="button" data-range="week" aria-pressed="true">Tuần</button><button type="button" data-range="month" aria-pressed="false">Tháng</button></div>
+<div class="legend"><span><i class="dot k7"></i>Sân 7</span><span><i class="dot k5"></i>Sân 5</span><span><i class="dot sd-pending"></i>Giữ chỗ</span><span><i class="dot sd-deposit"></i>Đã cọc</span><span><i class="dot sd-paid"></i>Đã thanh toán</span><span><i class="dot sd-cancelled"></i>Đã huỷ</span></div>
+</div>
+<div class="pfilter" id="pf" hidden></div>
+<div id="gridView"><div class="gscroll" id="gridBox"><div class="gtable" id="gridTable"></div></div>
+<p class="hint">Mỗi cột là một ngày trong tuần. Bấm vào ô trống để đặt sân, bấm vào lượt đặt để sửa. Vùng nền đậm hơn là giờ cao điểm 17h đến 22h.</p></div>
+<div id="monthView" hidden></div>
+<div id="listView" hidden></div>
+</section>
+<aside class="side" aria-label="Tìm kiếm và danh sách nhanh">
+<input class="inp" id="q" type="search" placeholder="Tìm theo tên, số điện thoại, ghi chú" aria-label="Tìm lượt đặt">
+<div class="sidebox"><div class="sidehead">
+<div class="seg small" id="sideTabs" role="group"><button type="button" data-tab="upcoming" aria-pressed="true">Sắp tới</button><button type="button" data-tab="owed" aria-pressed="false">Cần thu</button></div>
+<div class="tot" id="sideTot"></div></div><div id="sideList"></div></div>
+</aside></div></div>
+
+<div class="overlay" id="bkOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+<form id="bkForm" autocomplete="off" novalidate>
+<div class="mhead"><h2 id="bkTitle">Đặt sân mới</h2><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="mbody"><div class="fgrid">
+<label class="f">Tên khách<input class="inp" id="fName" type="text" placeholder="Ví dụ: Anh Hưng, đội FC Bình Thạnh"></label>
+<label class="f">Số điện thoại<input class="inp" id="fPhone" type="tel" inputmode="tel" placeholder="09xx xxx xxx"></label>
+<label class="f">Sân<select class="inp" id="fPitch"></select></label>
+<label class="f">Ngày<input class="inp" id="fDate" type="date"></label>
+<label class="f">Giờ bắt đầu<select class="inp" id="fStart"></select></label>
+<label class="f">Giờ kết thúc<select class="inp" id="fEnd"></select></label>
+<div class="f span2"><span>Thời lượng</span><div class="chips" id="durChips">
+<button type="button" class="chip" data-dur="90" aria-pressed="false">90 phút</button><span class="dur" id="durText"></span></div></div>
+<label class="f">Tiền sân (đồng)<input class="inp num" id="fPrice" type="text" inputmode="numeric"></label>
+<label class="f">Trạng thái<select class="inp" id="fStatus"></select></label>
+<label class="f span2">Trọng tài<select class="inp" id="fRef"><option value="0">Không</option><option value="1">Có</option></select></label>
+<label class="f span2" id="fDepositWrap" hidden>Tiền đã cọc (đồng)<input class="inp num" id="fDeposit" type="text" inputmode="numeric"></label>
+<label class="f span2" id="fRepeatWrap">Khách đá cố định<select class="inp" id="fRepeat"><option value="0">Chỉ một buổi</option><option value="3">Lặp lại hàng tuần, 4 tuần liên tiếp</option><option value="7">Lặp lại hàng tuần, 8 tuần liên tiếp</option><option value="11">Lặp lại hàng tuần, 12 tuần liên tiếp</option><option value="25">Lặp lại hàng tuần, 26 tuần liên tiếp</option></select></label>
+<label class="f span2">Ghi chú<input class="inp" id="fNote" type="text" placeholder="Thuê áo bib, nước, trọng tài…"></label>
+</div><div class="remain" id="fRemain"></div>
+<p class="hint"><b>Quy tắc đặt sân:</b> Sân 7 và Sân 5 không được đặt trùng giờ. Sân 5 được đặt tối đa 3 sân cùng một khung giờ.</p><p class="msg" id="fMsg" role="alert" hidden></p></div>
+<div class="mfoot"><div id="delArea" class="chips"></div><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="submit" class="btn primary" id="saveBtn">Lưu lượt đặt</button></div>
+</form></div></div>
+
+<div class="overlay" id="stOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+<form id="stForm" autocomplete="off" novalidate>
+<div class="mhead"><h2 id="stTitle">Cài đặt sân</h2><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="mbody"><div class="fgrid">
+<label class="f span2">Tên cụm sân<input class="inp" id="sVenue" type="text"></label>
+<label class="f">Giờ mở cửa<select class="inp" id="sOpen"></select></label>
+<label class="f">Giờ đóng cửa<select class="inp" id="sClose"></select></label></div>
+<h3 style="margin:18px 0 8px;font:600 18px var(--fd);letter-spacing:.04em;text-transform:uppercase">Danh sách sân</h3>
+<div class="plabel"><span>Tên sân</span><span>Loại sân</span><span>Giá mỗi giờ</span><span></span></div>
+<div id="pitchRows"></div><button type="button" class="btn sm" id="addPitch">+ Thêm sân</button>
+<p class="msg" id="sMsg" role="alert" hidden></p></div>
+<div class="mfoot"><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="submit" class="btn primary" id="sSave">Lưu cài đặt</button></div>
+</form></div></div>
+<div class="overlay" id="authOverlay"><div class="modal" style="max-width:430px"><form id="authForm" novalidate>
+<div class="mhead"><h2>Đăng Khoa Sport</h2></div>
+<div class="mbody"><p class="hint" style="margin:0 0 12px">Đăng nhập bằng tài khoản thành viên để xem hoặc nhập lịch đặt sân.</p>
+<div class="fgrid" id="authFields"><label class="f span2">Email<input class="inp" id="aEmail" type="email" autocomplete="username"></label>
+<label class="f span2">Mật khẩu<input class="inp" id="aPass" type="password" autocomplete="current-password"></label></div>
+<p class="remain" id="aInfo" hidden></p><p class="msg" id="aMsg" role="alert" hidden></p></div>
+<div class="mfoot"><button type="button" class="btn" id="aSignup">Tạo tài khoản</button><div class="grow"></div><button type="button" class="btn" id="aOut" hidden>Đăng xuất</button><button type="submit" class="btn primary" id="aLogin">Đăng nhập</button></div>
+</form></div></div>
+<div class="overlay" id="mbOverlay" hidden><div class="modal"><div class="mhead"><h2>Thành viên</h2><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="mbody"><div id="mbList"></div>
+<h3 style="margin:16px 0 8px;font:600 18px var(--fd);letter-spacing:.04em;text-transform:uppercase">Thêm thành viên</h3>
+<div class="fgrid"><label class="f">Email<input class="inp" id="mEmail" type="email"></label><label class="f">Họ tên<input class="inp" id="mName" type="text"></label>
+<label class="f span2">Vai trò<select class="inp" id="mRole"><option value="staff">Nhân viên (nhập, sửa, huỷ lịch)</option><option value="viewer">Chỉ xem</option><option value="admin">Quản trị viên (toàn quyền)</option></select></label></div>
+<p class="hint">Người này tự đăng ký tài khoản trên trang bằng đúng email trên, rồi dùng email và mật khẩu đó để đăng nhập.</p>
+<p class="msg" id="mMsg" role="alert" hidden></p></div>
+<div class="mfoot"><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="button" class="btn primary" id="mAdd">Thêm thành viên</button></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)},ROW=56;
+var DS=['CN','T2','T3','T4','T5','T6','T7'],DL=['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
+var STATUS={pending:'Giữ chỗ',deposit:'Đã cọc',paid:'Đã thanh toán',cancelled:'Đã huỷ'};
+var DEFP=[{id:'p1',name:'Sân 1',type:'Sân 5',price:300000},{id:'p2',name:'Sân 2',type:'Sân 5',price:300000},{id:'p3',name:'Sân 3',type:'Sân 7',price:500000},{id:'p4',name:'Sân 4',type:'Sân 7',price:500000}];
+function pad(n){return n<10?'0'+n:''+n}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parse(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2],12)}
+function addDays(s,n){var d=parse(s);d.setDate(d.getDate()+n);return ymd(d)}
+function diffDays(a,b){return Math.round((parse(a)-parse(b))/864e5)}
+function fmtMin(m){return pad(Math.floor(m/60))+':'+pad(m%60)}
+function dmy(s){var p=s.split('-');return p[2]+'/'+p[1]}
+function money(n){return new Intl.NumberFormat('vi-VN').format(Math.round(n||0))+'đ'}
+function fmtNum(d){d=String(d).replace(/\D/g,'').replace(/^0+(?=\d)/,'');return d.replace(/\B(?=(\d{3})+(?!\d))/g,'.')}
+function fmtInputs(){document.querySelectorAll('input.num').forEach(function(i){if(i.value&&i!==document.activeElement)i.value=fmtNum(i.value)})}
+function digits(v){return Number(String(v||'').replace(/\D/g,''))||0}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
+function plain(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase()}
+function nowMin(){var d=new Date();return d.getHours()*60+d.getMinutes()}
+function todayStr(){return ymd(new Date())}
+function durText(m){var h=Math.floor(m/60),r=m%60;return (h?h+' giờ':'')+(h&&r?' ':'')+(r?r+' phút':'')}
+function relLabel(s){var d=diffDays(s,todayStr());if(d===0)return 'Hôm nay';if(d===1)return 'Ngày mai';if(d===-1)return 'Hôm qua';return DS[parse(s).getDay()]+' '+dmy(s)}
+var CUTOFF='2000-01-01';
+var state={venue:'Đăng Khoa Sport',pitches:DEFP.slice(),open:300,close:1380,bookings:[],selected:todayStr(),view:'grid',range:'week',pf:'',admin:true,tab:'upcoming',q:'',dbOn:false,canWrite:null,loaded:false,note:'',firstScroll:false};
+try{var sv=localStorage.getItem('sodatsan:view');if(sv==='list'||sv==='grid')state.view=sv}catch(e){}
+try{var sr=localStorage.getItem('sodatsan:range');if(sr==='week'||sr==='month')state.range=sr}catch(e){}
+var db=null;
+function canEdit(){return state.dbOn&&state.canWrite!==false}
+function pitchById(id){return state.pitches.find(function(p){return p.id===id})||null}
+function pitchName(id){var p=pitchById(id);return p?p.name:'Sân đã xoá'}
+function pitchOrder(id){var i=state.pitches.findIndex(function(p){return p.id===id});return i<0?99:i}
+function active(b){return b.status!=='cancelled'}
+function collected(b){return b.status==='paid'?b.price:b.status==='deposit'?Math.min(b.deposit||0,b.price):0}
+function bookingById(id){return state.bookings.find(function(b){return b.id===id})||null}
+function dayBookings(s,inc){return state.bookings.filter(function(b){return b.date===s&&(inc||active(b))&&pfOK(b)}).sort(function(a,b){return a.start-b.start||pitchOrder(a.pitch)-pitchOrder(b.pitch)})}
+function pfOK(b){return !state.pf||pitchKind(b.pitch)===state.pf}
+var WD=['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật'];
+function wdName(s){return WD[(parse(s).getDay()+6)%7]}
+function weekStartOf(s){return addDays(s,-((parse(s).getDay()+6)%7))}
+function monthStartOf(s){return s.slice(0,8)+'01'}
+function monthEndOf(s){var d=parse(s);d.setMonth(d.getMonth()+1,0);return ymd(d)}
+function getRange(){var s=state.selected;return state.range==='month'?{from:monthStartOf(s),to:monthEndOf(s)}:{from:weekStartOf(s),to:addDays(weekStartOf(s),6)}}
+function rangeBookings(inc){var r=getRange();return state.bookings.filter(function(b){return b.date>=r.from&&b.date<=r.to&&(inc||active(b))&&pfOK(b)}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.start-b.start||pitchOrder(a.pitch)-pitchOrder(b.pitch)})}
+function shift(n){
+  if(state.range==='month'){var d=parse(monthStartOf(state.selected));d.setMonth(d.getMonth()+n);var s=ymd(d);state.selected=s.slice(0,7)===todayStr().slice(0,7)?todayStr():s}
+  else state.selected=addDays(state.selected,7*n);
+  renderAll();scrollGrid();
+}
+function layoutDay(day){
+  var out=[],cluster=[],cEnd=0;
+  function flush(){var lanes=[],items=[];cluster.forEach(function(b){var i=0;while(lanes[i]!==undefined&&lanes[i]>b.start)i++;lanes[i]=b.end;items.push({b:b,lane:i})});items.forEach(function(x){x.n=lanes.length;out.push(x)});cluster=[]}
+  day.forEach(function(b){if(cluster.length&&b.start>=cEnd){flush();cEnd=0}cluster.push(b);cEnd=Math.max(cEnd,b.end)});
+  if(cluster.length)flush();return out;
+}
+function toDoc(b){var o={};Object.keys(b).forEach(function(k){if(k!=='id'&&b[k]!==undefined)o[k]=b[k]});return o}
+var tt=null;
+function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},4200)}
+
+function renderBand(){
+  $('#venueName').textContent=state.venue;
+  var d=parse(state.selected);
+  var rg=getRange(),t0=todayStr();
+  if(state.range==='month'){$('#dateBig').textContent='Tháng '+(d.getMonth()+1)+'/'+d.getFullYear();$('#dateSub').textContent=t0.slice(0,7)===state.selected.slice(0,7)?'Tháng này':'Xem theo tháng'}
+  else{$('#dateBig').textContent=dmy(rg.from)+' – '+dmy(rg.to)+'/'+parse(rg.to).getFullYear();var wk=diffDays(rg.from,weekStartOf(t0))/7;$('#dateSub').textContent=wk===0?'Tuần này':wk===1?'Tuần sau':wk===-1?'Tuần trước':'Xem theo tuần'}
+  $('#datePick').value=state.selected;$('#datePick').min=CUTOFF;
+  $('#prevDay').disabled=rg.from<=CUTOFF;
+  $('#addBtn').disabled=!canEdit();$('#settingsBtn').disabled=!(canEdit()&&state.admin);
+}
+function renderBanners(){
+  var h='';
+  if(!state.dbOn&&state.loaded)h+='<div class="banner warn"><span>Chưa kết nối được dữ liệu. Hãy đăng nhập để tiếp tục.</span></div>';
+  else if(state.canWrite===false)h+='<div class="banner"><span>Tài khoản của bạn chỉ có quyền xem. Hãy nhờ quản trị viên cấp vai trò Nhân viên để nhập và sửa lịch.</span></div>';
+  if(state.note)h+='<div class="banner warn"><span>'+esc(state.note)+'</span></div>';
+  if(canEdit()&&state.bookings.some(function(b){return b.sample}))h+='<div class="banner"><span>Sổ đang có lượt đặt mẫu để bạn xem thử. Bấm vào từng lượt để sửa, hoặc xoá hết khi bắt đầu dùng thật.</span><button class="btn sm" type="button" id="clearSample">Xoá dữ liệu mẫu</button></div>';
+  if(getRange().from<CUTOFF)h+='<div class="banner warn"><span>Sổ chỉ tải các lượt đặt từ '+dmy(CUTOFF)+' trở lại đây. Ngày này có thể thiếu dữ liệu.</span></div>';
+  $('#banners').innerHTML=h;
+}
+function renderKpis(){
+  var day=rangeBookings(),rev=day.reduce(function(a,b){return a+b.price},0),got=day.reduce(function(a,b){return a+collected(b)},0);
+  var hb=day.reduce(function(a,b){return a+(b.end-b.start)/60},0),ht=((state.close-state.open)/60)*(state.pf?state.pitches.filter(function(p){return pitchKind(p.id)===state.pf}).length:state.pitches.length)*(diffDays(getRange().to,getRange().from)+1),per=state.range==='month'?'tháng':'tuần';
+  var pct=ht?Math.min(100,Math.round(hb/ht*100)):0,ym=state.selected.slice(0,7);
+  var mon=state.bookings.filter(function(b){return active(b)&&pfOK(b)&&b.date.slice(0,7)===ym}),mr=mon.reduce(function(a,b){return a+b.price},0);
+  var mn=(ym+'-01')<CUTOFF?' (từ '+dmy(CUTOFF)+')':'';
+  $('#kpis').innerHTML='<div class="led"><div class="lb">Lượt đặt trong '+per+'</div><div class="v">'+day.length+'<small>lượt</small></div><div class="sb">'+(hb%1?hb.toFixed(1):hb)+' giờ sân được đặt</div></div>'
+  +'<div class="led"><div class="lb">Doanh thu '+per+'</div><div class="v">'+money(rev)+'</div><div class="sb">Đã thu '+money(got)+' · còn '+money(rev-got)+'</div></div>'
+  +'<div class="led"><div class="lb">Công suất sân</div><div class="v">'+pct+'<small>%</small></div><div class="bar"><i style="width:'+pct+'%"></i></div></div>'
+  +'<div class="led"><div class="lb">Doanh thu tháng '+Number(ym.slice(5))+'</div><div class="v">'+money(mr)+'</div><div class="sb">'+mon.length+' lượt đặt'+mn+'</div></div>';
+}
+function renderGrid(){
+  var rg=getRange(),days=[],t=todayStr(),H=(state.close-state.open)/60*ROW,tbl=$('#gridTable');for(var i=0;i<7;i++)days.push(addDays(rg.from,i));tbl.style.setProperty('--n',7);
+  var head='<div class="gh gcorner"></div>';
+  days.forEach(function(s){var n=dayBookings(s).length;head+='<div class="gh'+(s===t?' today':'')+'"><b>'+wdName(s)+'</b><span>'+Number(s.slice(8))+'/'+Number(s.slice(5,7))+(n?' · '+n+' lượt':'')+'</span></div>'});
+  var gut='<div class="ggut" style="height:'+H+'px">';
+  for(var m=state.open;m<state.close;m+=60)gut+='<div class="gt" style="top:'+((m-state.open)/60*ROW+(m===state.open?8:0))+'px">'+fmtMin(m)+'</div>';
+  var isT=days.indexOf(t)>=0;if(isT)gut+='<div class="nowdot" id="nowdot"></div>';gut+='</div>';
+  var p1=Math.max(state.open,1020),p2=Math.min(state.close,1320);
+  var ph=p2>p1?'<div class="prime" style="top:'+((p1-state.open)/60*ROW)+'px;height:'+((p2-p1)/60*ROW)+'px"></div>':'',cols='';
+  days.forEach(function(s){
+    var bl='';
+    layoutDay(dayBookings(s,true)).forEach(function(x){var b=x.b;
+      var top=(b.start-state.open)/60*ROW,h=Math.max((b.end-b.start)/60*ROW-2,24);
+      bl+='<button type="button" class="bk k'+(pitchKind(b.pitch)||'x')+' s-'+b.status+'" data-id="'+b.id+'" style="top:'+(top+1)+'px;height:'+h+'px;left:calc('+(x.lane*100/x.n)+'% + 2px);width:calc('+(100/x.n)+'% - 4px)" title="'+esc((b.name||'Khách lẻ')+' · '+fmtMin(b.start)+'–'+fmtMin(b.end)+' · '+pitchName(b.pitch)+' · '+STATUS[b.status])+'"><span class="bk-t">'+esc(b.name||'Khách lẻ')+'</span><span class="bk-m">'+fmtMin(b.start)+'–'+fmtMin(b.end)+'</span>'+'<span class="bk-p">'+esc(pitchName(b.pitch))+(b.referee?' · Trọng tài':'')+'</span>'+((h>=70&&x.n<3)||b.status==='cancelled'?'<span class="bk-s">'+STATUS[b.status]+'</span>':'')+'</button>';
+    });
+    cols+='<div class="gcol" data-date="'+s+'" style="height:'+H+'px">'+ph+bl+(s===t?'<div class="now"></div>':'')+'</div>';
+  });
+  tbl.innerHTML=head+gut+cols;placeNow();
+}
+function placeNow(){
+  if(!$('#nowdot'))return;
+  var m=nowMin(),y=(m-state.open)/60*ROW,vis=m>=state.open&&m<=state.close;
+  document.querySelectorAll('.now').forEach(function(e){e.style.top=y+'px';e.style.display=vis?'':'none'});
+  var d=$('#nowdot');if(d){d.style.top=y+'px';d.style.display=vis?'':'none'}
+}
+function renderList(){
+  var all=rangeBookings(true),box=$('#listView'),last='';
+  if(!all.length){box.innerHTML='<div class="empty"><b>Chưa có lượt đặt nào trong '+(state.range==='month'?'tháng':'tuần')+' này</b>Bấm “+ Đặt sân” hoặc chuyển sang Lịch sân và bấm vào khung giờ trống.</div>';return}
+  var h='<div class="lrows">';
+  all.forEach(function(b){var owe=b.price-collected(b);
+    if(b.date!==last){last=b.date;h+='<div class="lday">'+wdName(b.date)+' '+Number(b.date.slice(8))+'/'+Number(b.date.slice(5,7))+'</div>'}
+    h+='<div class="lrow is-'+b.status+'" role="button" tabindex="0" data-open="'+b.id+'"><div class="t">'+fmtMin(b.start)+'<small>đến '+fmtMin(b.end)+'</small></div>'
+    +'<div class="who"><b>'+esc(b.name||'Khách lẻ')+'</b><span>'+esc(pitchName(b.pitch))+(b.referee?' · Có trọng tài':'')+(b.phone?' · '+esc(b.phone):'')+(b.note?' · '+esc(b.note):'')+'</span></div>'
+    +'<div class="mny"><b>'+money(b.price)+'</b><span>'+(b.status==='cancelled'?'Đã huỷ':owe>0?'Còn thu '+money(owe):'Đã thu đủ')+'</span></div>'
+    +'<div class="lact"><span class="pill s-'+b.status+'">'+STATUS[b.status]+'</span>'+(canEdit()&&b.status!=='paid'&&b.status!=='cancelled'?'<button type="button" class="btn sm" data-pay="'+b.id+'">Thu đủ</button>':'')+'</div></div>';
+  });
+  box.innerHTML=h+'</div>';
+}
+function setView(v){
+  state.view=v;try{localStorage.setItem('sodatsan:view',v)}catch(e){}
+  renderMain();scrollGrid();
+}
+function sideRow(b){return '<button type="button" class="srow" data-open="'+b.id+'"><div class="st"><b>'+fmtMin(b.start)+'</b><span>'+esc(relLabel(b.date))+'</span></div><div class="sm"><b>'+esc(b.name||'Khách lẻ')+'</b><span>'+esc(pitchName(b.pitch))+(b.phone?' · '+esc(b.phone):'')+'</span></div><span class="pill s-'+b.status+'">'+STATUS[b.status]+'</span></button>'}
+function renderSide(){
+  var q=plain(state.q.trim()),list,tot='',empty='',t=todayStr(),nm=nowMin();
+  document.querySelectorAll('#sideTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(!q&&b.dataset.tab===state.tab))});
+  if(q){list=state.bookings.filter(function(b){return plain((b.name||'')+' '+(b.phone||'')+' '+(b.note||'')).indexOf(q)>=0}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:a.start-b.start}).slice(0,30);tot='<b>'+list.length+'</b> kết quả';empty='Không tìm thấy lượt đặt nào khớp.'}
+  else if(state.tab==='owed'){var ow=state.bookings.filter(function(b){return active(b)&&b.status!=='paid'&&(b.date<t||(b.date===t&&b.end<=nm))});var sum=ow.reduce(function(a,b){return a+b.price-collected(b)},0);list=ow.sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.start-a.start}).slice(0,15);tot='Chưa thu <b>'+money(sum)+'</b>';empty='Không có lượt đặt nào còn nợ. Mọi buổi đã đá đều thu đủ.'}
+  else{list=state.bookings.filter(function(b){return active(b)&&(b.date>t||(b.date===t&&b.end>nm))}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.start-b.start}).slice(0,10);empty='Chưa có lượt đặt nào sắp tới.'}
+  $('#sideTot').innerHTML=tot;
+  $('#sideList').innerHTML=list.length?list.map(sideRow).join(''):'<div class="sempty">'+(state.loaded?empty:'Đang tải dữ liệu…')+'</div>';
+}
+function renderAll(){renderBand();renderBanners();renderKpis();renderMain();renderYnav();renderSide()}
+var YEARS=[{y:2026,m:[11,12]},{y:2027,m:[2,3,4,5,6,7,8,9,10,11,12]}].concat([2028,2029,2030,2031].map(function(y){return{y:y,m:[1,2,3,4,5,6,7,8,9,10,11,12]}})),openYears={};
+function cntMonth(ym){return state.bookings.filter(function(b){return active(b)&&pfOK(b)&&b.date.slice(0,ym.length)===ym}).length}
+function renderYnav(){
+  var cur=state.selected.slice(0,7),h='<div class="yn-title">Lọc theo thời gian</div>';
+  YEARS.forEach(function(Y){
+    var open=openYears[Y.y]===undefined?String(Y.y)===state.selected.slice(0,4):openYears[Y.y];
+    h+='<button type="button" class="yn-y" data-year="'+Y.y+'" aria-expanded="'+open+'"><span>'+(open?'▾':'▸')+' Năm '+Y.y+'</span><em>'+cntMonth(''+Y.y)+'</em></button>';
+    if(open){h+='<div class="yn-ms">';Y.m.forEach(function(m){var ym=Y.y+'-'+pad(m),n=cntMonth(ym);h+='<button type="button" class="yn-m'+(state.range==='month'&&cur===ym?' on':'')+'" data-ym="'+ym+'"><span>Tháng '+m+'</span><em>'+(n||'')+'</em></button>'});h+='</div>'}
+  });
+  $('#ynav').innerHTML=h;
+}
+function renderPf(){
+  var box=$('#pf'),kinds=['5','7'].filter(function(k){return state.pitches.some(function(p){return pitchKind(p.id)===k})});
+  if(state.pf&&kinds.indexOf(state.pf)<0)state.pf='';
+  if(kinds.length<2){box.hidden=true;box.innerHTML='';return}
+  box.hidden=false;
+  var h='<span class="pf-l">Lọc sân:</span><button type="button" class="chip" data-pf="" aria-pressed="'+(!state.pf)+'">Tất cả</button>';
+  kinds.forEach(function(k){h+='<button type="button" class="chip" data-pf="'+k+'" aria-pressed="'+(state.pf===k)+'"><i class="dot k'+k+'"></i> Sân '+k+'</button>'});
+  box.innerHTML=h;
+}
+function renderMain(){
+  renderPf();
+  var g=state.view==='grid',m=state.range==='month';
+  $('#gridView').hidden=!(g&&!m);$('#monthView').hidden=!(g&&m);$('#listView').hidden=g;
+  document.querySelectorAll('#viewSeg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.view===state.view))});
+  document.querySelectorAll('#rangeSeg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.range===state.range))});
+  if(g&&!m)renderGrid();else if(g)renderMonth();else renderList();
+}
+function setRange(r){state.range=r;try{localStorage.setItem('sodatsan:range',r)}catch(e){}renderAll();scrollGrid()}
+function renderMonth(){
+  var rg=getRange(),first=weekStartOf(rg.from),t=todayStr(),ym=state.selected.slice(0,7),h='<div class="mgrid">';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(x){h+='<div class="mh">'+x+'</div>'});
+  for(var i=0;i<42;i++){
+    var s=addDays(first,i);if(s>rg.to&&i%7===0)break;
+    if(s.slice(0,7)!==ym){h+='<div class="mc out"><span class="md">'+Number(s.slice(8))+'</span></div>';continue}
+    var day=dayBookings(s),n=day.length,rev=day.reduce(function(a,b){return a+b.price},0);
+    h+='<button type="button" class="mc'+(s===t?' today':'')+(s===state.selected?' sel':'')+'" data-date="'+s+'"><span class="md">'+Number(s.slice(8))+'</span>'+(n?'<span class="mn">'+n+' lượt</span><span class="mr">'+Math.round(rev/1000)+'k</span>':'')+'</button>';
+  }
+  $('#monthView').innerHTML=h+'</div><p class="hint">Bấm vào một ngày để xem tuần chứa ngày đó.</p>';
+}
+function scrollGrid(){
+  var box=$('#gridBox');if(!box||state.view!=='grid')return;var t,day=rangeBookings(),rg=getRange(),td=todayStr();
+  if(td>=rg.from&&td<=rg.to)t=Math.max(state.open,nowMin()-90);
+  else if(day.length)t=Math.max(state.open,Math.min.apply(null,day.map(function(b){return b.start}))-30);
+  else t=Math.min(Math.max(state.open,960),state.close-120);
+  box.scrollTop=(t-state.open)/60*ROW;
+}
+function setDate(s,ns){if(!s)return;state.selected=s;renderAll();if(!ns)scrollGrid()}
+
+var form={id:null,priceTouched:false,delStage:0,groupId:null,created:null};
+function timeOpts(from,to,cur){var h='',seen=false;for(var m=from;m<=to;m+=30){h+='<option value="'+m+'"'+(m===cur?' selected':'')+'>'+fmtMin(m)+'</option>';if(m===cur)seen=true}if(!seen&&cur!=null)h+='<option value="'+cur+'" selected>'+fmtMin(cur)+'</option>';return h}
+function curPrice(){var p=pitchById($('#fPitch').value),m=Number($('#fEnd').value)-Number($('#fStart').value);return p&&m>0?Math.round(p.price*m/60):0}
+function syncDur(){var m=Number($('#fEnd').value)-Number($('#fStart').value);$('#durText').textContent=m>0?'= '+durText(m):'Giờ kết thúc phải sau giờ bắt đầu';document.querySelectorAll('#durChips .chip').forEach(function(c){c.setAttribute('aria-pressed',String(Number(c.dataset.dur)===m))})}
+function syncRemain(){fmtInputs();var price=digits($('#fPrice').value),st=$('#fStatus').value,dep=digits($('#fDeposit').value),got=st==='paid'?price:st==='deposit'?Math.min(dep,price):0,left=st==='cancelled'?0:price-got;$('#fRemain').innerHTML='<span>Đã thu <b>'+money(got)+'</b></span><span>Còn phải thu <b>'+money(left)+'</b></span>';$('#fDepositWrap').hidden=st!=='deposit'}
+function autoPrice(){if(form.priceTouched)return;$('#fPrice').value=curPrice();syncRemain()}
+function renderDel(){
+  var a=$('#delArea');if(!form.id){a.innerHTML='';return}
+  var later=form.groupId?state.bookings.filter(function(b){return b.groupId===form.groupId&&b.date>$('#fDate').dataset.orig&&b.id!==form.id}).length:0;
+  if(form.delStage===0){a.innerHTML=($('#fStatus').value!=='cancelled'?'<button type="button" class="btn" data-del="cancel">Huỷ lịch</button>':'')+'<button type="button" class="btn danger" data-del="1">Xoá lượt đặt</button>';return}
+  a.innerHTML='<button type="button" class="btn danger armed" data-del="2">Bấm lại để xoá</button>'+(later?'<button type="button" class="btn danger" data-del="series">Xoá cả '+later+' tuần sau</button>':'');
+}
+function openForm(o){
+  o=o||{};if(!canEdit()){toast('Bạn chưa có quyền sửa sổ này.');return}
+  var b=o.id?bookingById(o.id):null;
+  form={id:b?b.id:null,priceTouched:!!b,delStage:0,groupId:b?b.groupId||null:null,created:b?b.createdAt||null:null};
+  $('#bkTitle').textContent=b?'Sửa lượt đặt':'Đặt sân mới';$('#saveBtn').textContent=b?'Lưu thay đổi':'Lưu lượt đặt';$('#fMsg').hidden=true;
+  var def=b||{date:o.date||state.selected,pitch:o.pitch||(state.pitches[0]&&state.pitches[0].id),start:o.start!=null?o.start:Math.min(Math.max(state.open,1080),state.close-90),end:null,name:'',phone:'',price:0,deposit:0,status:'pending',note:''};
+  if(def.end==null)def.end=Math.min(def.start+90,state.close);
+  $('#fName').value=def.name||'';$('#fPhone').value=def.phone||'';
+  $('#fPitch').innerHTML=state.pitches.map(function(p){return '<option value="'+p.id+'"'+(p.id===def.pitch?' selected':'')+'>'+esc(p.name)+(p.type?' ('+esc(p.type)+')':'')+'</option>'}).join('');
+  if(b&&!pitchById(b.pitch))$('#fPitch').insertAdjacentHTML('beforeend','<option value="'+esc(b.pitch)+'" selected>'+esc(pitchName(b.pitch))+'</option>');
+  $('#fDate').value=def.date;$('#fDate').dataset.orig=def.date;
+  $('#fStart').innerHTML=timeOpts(state.open,state.close-30,def.start);$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,def.end);
+  $('#fStatus').innerHTML=Object.keys(STATUS).map(function(k){return '<option value="'+k+'"'+(k===def.status?' selected':'')+'>'+STATUS[k]+'</option>'}).join('');
+  $('#fPrice').value=b?def.price:'';$('#fDeposit').value=def.deposit||'';$('#fNote').value=def.note||'';
+  $('#fRepeat').value='0';$('#fRepeatWrap').hidden=!!b;$('#fRef').value=def.referee?'1':'0';
+  if(!b)$('#fPrice').value=curPrice();
+  syncDur();syncRemain();renderDel();$('#bkOverlay').hidden=false;setTimeout(function(){$('#fName').focus()},30);
+}
+function closeOverlays(){$('#bkOverlay').hidden=true;$('#stOverlay').hidden=true;$('#mbOverlay').hidden=true}
+var MAX_S5=3;
+function pitchKind(id){var p=pitchById(id);return p?String(p.type||'').replace(/\D/g,''):''}
+function findConflict(date,pitch,s,e,ign){
+  var same=state.bookings.find(function(b){return b.id!==ign&&active(b)&&b.date===date&&b.pitch===pitch&&s<b.end&&e>b.start});
+  if(same)return same;
+  var kind=pitchKind(pitch);if(kind!=='5'&&kind!=='7')return null;
+  var over=state.bookings.filter(function(b){return b.id!==ign&&active(b)&&b.date===date&&s<b.end&&e>b.start});
+  var other=over.find(function(b){var k=pitchKind(b.pitch);return kind==='7'?k==='5':k==='7'});
+  if(other)return Object.assign({},other,{rule:'Sân 7 và Sân 5 không được đặt trùng giờ. Khung giờ này đã có '+(other.name||'Khách lẻ')+' đặt '+pitchName(other.pitch)+' ('+fmtMin(other.start)+'–'+fmtMin(other.end)+').'});
+  if(kind==='5'){
+    var f=over.filter(function(b){return pitchKind(b.pitch)==='5'});
+    var pts=[s].concat(f.map(function(b){return b.start}).filter(function(t){return t>s&&t<e}));
+    var full=pts.some(function(t){return f.filter(function(b){return b.start<=t&&b.end>t}).length>=MAX_S5});
+    if(full)return {rule:'Sân 5 chỉ được đặt tối đa '+MAX_S5+' sân cùng một khung giờ. Khung giờ này đã đủ '+MAX_S5+' sân 5.'};
+  }
+  return null;
+}
+function conflictText(c,pitch){return c.rule||('Trùng giờ với '+(c.name||'Khách lẻ')+' ('+fmtMin(c.start)+'–'+fmtMin(c.end)+') trên '+pitchName(pitch)+'.')}
+function showMsg(el,t){el.textContent=t;el.hidden=false}
+async function saveBooking(ev){
+  ev.preventDefault();var msg=$('#fMsg');msg.hidden=true;
+  var date=$('#fDate').value,pitch=$('#fPitch').value,start=Number($('#fStart').value),end=Number($('#fEnd').value);
+  if(!date)return showMsg(msg,'Chọn ngày đá.');
+  if(!(end>start))return showMsg(msg,'Giờ kết thúc phải sau giờ bắt đầu.');
+  var price=digits($('#fPrice').value),status=$('#fStatus').value,dep=digits($('#fDeposit').value);
+  if(status==='paid')dep=price;
+  if(status==='deposit'&&dep<=0)return showMsg(msg,'Nhập số tiền khách đã cọc, hoặc chọn trạng thái Giữ chỗ.');
+  if(status!=='deposit'&&status!=='paid')dep=0;
+  var base={pitch:pitch,start:start,end:end,name:$('#fName').value.trim(),phone:$('#fPhone').value.trim(),price:price,deposit:dep,status:status,note:$('#fNote').value.trim(),referee:$('#fRef').value==='1'};
+  var btn=$('#saveBtn');btn.disabled=true;
+  try{
+    if(form.id){
+      var c=status!=='cancelled'?findConflict(date,pitch,start,end,form.id):null;
+      if(c){showMsg(msg,conflictText(c,pitch));return}
+      var doc=Object.assign({},base,{date:date,createdAt:form.created||Date.now()});if(form.groupId)doc.groupId=form.groupId;
+      await db.doc('bookings/'+form.id).set(doc);toast('Đã lưu thay đổi.');
+    }else{
+      var weeks=Number($('#fRepeat').value)||0,gid=weeks?'g'+Date.now().toString(36):null,made=0,skipped=[];
+      if(status!=='cancelled'&&!weeks){var c0=findConflict(date,pitch,start,end,null);if(c0){showMsg(msg,conflictText(c0,pitch)+(c0.rule?'':' Chọn giờ hoặc sân khác.'));return}}
+      for(var i=0;i<=weeks;i++){
+        var d=addDays(date,i*7);
+        if(status!=='cancelled'&&findConflict(d,pitch,start,end,null)){skipped.push(dmy(d));continue}
+        var nd=Object.assign({},base,{date:d,createdAt:Date.now()});if(gid)nd.groupId=gid;
+        await db.collection('bookings').doc().set(nd);made++;
+      }
+      toast(weeks?('Đã tạo '+made+' lượt'+(skipped.length?', bỏ qua '+skipped.length+' ngày trùng giờ ('+skipped.join(', ')+')':'')+'.'):'Đã thêm lượt đặt.');
+    }
+    closeOverlays();var rr=getRange();if(date<rr.from||date>rr.to)setDate(date);
+  }catch(err){showMsg(msg,'Không lưu được: '+((err&&err.message)||'lỗi không xác định')+'. Thử lại sau ít giây.')}
+  finally{btn.disabled=false}
+}
+async function deleteBooking(mode){
+  var msg=$('#fMsg'),orig=$('#fDate').dataset.orig;
+  try{
+    if(mode==='series'&&form.groupId){var ids=state.bookings.filter(function(b){return b.groupId===form.groupId&&b.date>=orig}).map(function(b){return b.id});for(var i=0;i<ids.length;i++)await db.doc('bookings/'+ids[i]).delete();toast('Đã xoá '+ids.length+' lượt đặt trong chuỗi.')}
+    else{await db.doc('bookings/'+form.id).delete();toast('Đã xoá lượt đặt.')}
+    closeOverlays();
+  }catch(err){showMsg(msg,'Không xoá được: '+((err&&err.message)||'lỗi không xác định'))}
+}
+async function quickPay(id){
+  var b=bookingById(id);if(!b||!canEdit())return;
+  try{var d=toDoc(b);d.status='paid';d.deposit=b.price;delete d.sample;await db.doc('bookings/'+id).set(d);toast('Đã ghi nhận thu đủ '+money(b.price)+'.')}
+  catch(err){toast('Không cập nhật được: '+((err&&err.message)||'lỗi'))}
+}
+async function clearSample(){
+  var ids=state.bookings.filter(function(b){return b.sample}).map(function(b){return b.id});
+  try{for(var i=0;i<ids.length;i++)await db.doc('bookings/'+ids[i]).delete();toast('Đã xoá '+ids.length+' lượt đặt mẫu.')}
+  catch(err){toast('Không xoá hết được: '+((err&&err.message)||'lỗi'))}
+}
+
+var draft=[];
+function hourOpts(from,to,cur){var h='';for(var m=from;m<=to;m+=60)h+='<option value="'+m+'"'+(m===cur?' selected':'')+'>'+fmtMin(m)+'</option>';return h}
+function renderPitchRows(){
+  $('#pitchRows').innerHTML=draft.map(function(p,i){return '<div class="prow" data-i="'+i+'"><input class="inp pn" type="text" value="'+esc(p.name)+'" data-f="name" aria-label="Tên sân"><input class="inp" type="text" value="'+esc(p.type||'')+'" data-f="type" placeholder="Sân 7" aria-label="Loại sân"><input class="inp num" type="text" inputmode="numeric" value="'+(p.price||'')+'" data-f="price" placeholder="500.000" aria-label="Giá mỗi giờ"><button type="button" class="btn sm danger" data-rm="'+i+'">Xoá</button></div>'}).join('');fmtInputs();
+}
+function openSettings(){
+  if(!canEdit()||!state.admin)return;
+  $('#sVenue').value=state.venue;$('#sOpen').innerHTML=hourOpts(0,1080,state.open);$('#sClose').innerHTML=hourOpts(720,1440,state.close);
+  draft=state.pitches.map(function(p){return Object.assign({},p)});renderPitchRows();$('#sMsg').hidden=true;$('#stOverlay').hidden=false;setTimeout(function(){$('#sVenue').focus()},30);
+}
+async function saveSettings(ev){
+  ev.preventDefault();var msg=$('#sMsg');msg.hidden=true;
+  var open=Number($('#sOpen').value),close=Number($('#sClose').value);
+  if(close-open<120)return showMsg(msg,'Giờ đóng cửa phải sau giờ mở cửa ít nhất 2 tiếng.');
+  if(!draft.length)return showMsg(msg,'Cần có ít nhất một sân.');
+  for(var i=0;i<draft.length;i++)if(!String(draft[i].name||'').trim())return showMsg(msg,'Mỗi sân cần có tên.');
+  var outside=state.bookings.filter(function(b){return active(b)&&(b.start<open||b.end>close)}).length,btn=$('#sSave');btn.disabled=true;
+  try{
+    await db.doc('settings/main').set({venue:$('#sVenue').value.trim()||'Đăng Khoa Sport',open:open,close:close,pitches:draft.map(function(p){return{id:p.id,name:String(p.name).trim(),type:String(p.type||'').trim(),price:digits(p.price)}})});
+    closeOverlays();toast(outside?'Đã lưu. '+outside+' lượt đặt nằm ngoài giờ mở cửa mới nên không hiện trên lịch.':'Đã lưu cài đặt sân.');
+  }catch(err){showMsg(msg,'Không lưu được: '+((err&&err.message)||'lỗi không xác định'))}
+  finally{btn.disabled=false}
+}
+
+$('#prevDay').onclick=function(){shift(-1)};
+$('#nextDay').onclick=function(){shift(1)};
+$('#todayBtn').onclick=function(){setDate(todayStr())};
+$('#datePick').onchange=function(e){if(e.target.value)setDate(e.target.value)};
+$('#addBtn').onclick=function(){openForm({})};
+$('#settingsBtn').onclick=openSettings;
+$('#viewSeg').onclick=function(e){var b=e.target.closest('button[data-view]');if(b)setView(b.dataset.view)};
+$('#rangeSeg').onclick=function(e){var b=e.target.closest('button[data-range]');if(b)setRange(b.dataset.range)};
+$('#monthView').onclick=function(e){var c=e.target.closest('button[data-date]');if(!c)return;state.selected=c.dataset.date;setRange('week')};
+$('#sideTabs').onclick=function(e){var b=e.target.closest('button[data-tab]');if(!b)return;state.tab=b.dataset.tab;$('#q').value='';state.q='';renderSide()};
+$('#q').oninput=function(e){state.q=e.target.value;renderSide()};
+
+$('#banners').onclick=function(e){if(e.target.id==='clearSample')clearSample()};
+$('#gridBox').onclick=function(e){
+  var bk=e.target.closest('.bk');if(bk){openForm({id:bk.dataset.id});return}
+  var col=e.target.closest('.gcol');if(!col||!canEdit())return;
+  var y=e.clientY-col.getBoundingClientRect().top,s=state.open+Math.floor(y/ROW*2)*30,st=Math.max(state.open,Math.min(s,state.close-30)),dt=col.dataset.date;
+  var fp=state.pitches.find(function(p){return !findConflict(dt,p.id,st,Math.min(st+90,state.close),null)})||state.pitches[0]||{};
+  openForm({pitch:fp.id,start:st,date:dt});
+};
+$('#listView').onclick=function(e){
+  var pay=e.target.closest('[data-pay]');if(pay){e.stopPropagation();quickPay(pay.dataset.pay);return}
+  var r=e.target.closest('[data-open]');if(r)openForm({id:r.dataset.open});
+};
+$('#listView').onkeydown=function(e){if(e.key!=='Enter'&&e.key!==' ')return;var r=e.target.closest('[data-open]');if(r&&e.target===r){e.preventDefault();openForm({id:r.dataset.open})}};
+$('#sideList').onclick=function(e){var r=e.target.closest('[data-open]');if(!r)return;var b=bookingById(r.dataset.open);if(!b)return;state.selected=b.date;renderAll();scrollGrid();openForm({id:b.id})};
+document.addEventListener('click',function(e){if(e.target.closest('[data-close]')||(e.target.classList&&e.target.classList.contains('overlay')))closeOverlays()});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeOverlays();return}
+  var tag=(e.target.tagName||'').toLowerCase();
+  if(!$('#bkOverlay').hidden||!$('#stOverlay').hidden||tag==='input'||tag==='select'||tag==='textarea')return;
+  if(e.key==='ArrowLeft'&&!$('#prevDay').disabled)shift(-1);
+  if(e.key==='ArrowRight')shift(1);
+});
+$('#bkForm').onsubmit=saveBooking;
+$('#fPitch').onchange=autoPrice;
+$('#fStart').onchange=function(){var s=Number($('#fStart').value),e=Number($('#fEnd').value);if(e<=s)$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(s+90,state.close));syncDur();autoPrice()};
+$('#fEnd').onchange=function(){syncDur();autoPrice()};
+$('#durChips').onclick=function(e){var c=e.target.closest('.chip');if(!c)return;$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(Number($('#fStart').value)+Number(c.dataset.dur),state.close));syncDur();autoPrice()};
+$('#fPrice').oninput=function(){form.priceTouched=true;syncRemain()};
+$('#fDeposit').oninput=syncRemain;
+$('#fStatus').onchange=function(){if($('#fStatus').value==='deposit'&&!digits($('#fDeposit').value))$('#fDeposit').value=Math.round(digits($('#fPrice').value)*0.3/10000)*10000||'';syncRemain()};
+$('#delArea').onclick=function(e){var b=e.target.closest('[data-del]');if(!b)return;var v=b.dataset.del;if(v==='1'){form.delStage=1;renderDel()}else if(v==='2')deleteBooking('one');else if(v==='series')deleteBooking('series');else if(v==='cancel'){$('#fStatus').value='cancelled';syncRemain();$('#bkForm').requestSubmit()}};
+$('#stForm').onsubmit=saveSettings;
+$('#addPitch').onclick=function(){if(draft.length>=8){showMsg($('#sMsg'),'Tối đa 8 sân.');return}draft.push({id:'p'+Date.now().toString(36),name:'Sân '+(draft.length+1),type:'Sân 7',price:500000});renderPitchRows()};
+$('#pitchRows').oninput=function(e){var row=e.target.closest('.prow');if(!row||!e.target.dataset.f)return;draft[Number(row.dataset.i)][e.target.dataset.f]=e.target.value};
+$('#pitchRows').onclick=function(e){
+  var r=e.target.closest('[data-rm]');if(!r)return;var i=Number(r.dataset.rm),p=draft[i];
+  if(state.bookings.some(function(b){return b.pitch===p.id})){showMsg($('#sMsg'),'Sân này đang có lượt đặt nên chưa thể xoá. Hãy đổi tên sân thay vì xoá.');return}
+  draft.splice(i,1);renderPitchRows();
+};
+
+renderAll();
+$('#pf').onclick=function(e){var b=e.target.closest('[data-pf]');if(!b)return;state.pf=b.dataset.pf;renderAll()};
+$('#ynav').onclick=function(e){
+  var y=e.target.closest('[data-year]');if(y){var k=y.dataset.year,cur=openYears[k]===undefined?k===state.selected.slice(0,4):openYears[k];openYears[k]=!cur;renderYnav();return}
+  var m=e.target.closest('[data-ym]');if(m){var ym=m.dataset.ym;state.selected=ym===todayStr().slice(0,7)?todayStr():ym+'-01';setRange('month')}
+};
+document.addEventListener('input',function(e){
+  var el=e.target;if(!el.classList||!el.classList.contains('num'))return;
+  var pos=el.selectionStart||0,before=el.value.slice(0,pos).replace(/\D/g,'').length,d=el.value.replace(/\D/g,'');
+  el.value=d?fmtNum(d):'';var n=0,np=0;for(;np<el.value.length&&n<before;np++)if(/\d/.test(el.value[np]))n++;
+  try{el.setSelectionRange(np,np)}catch(x){}
+});
+setInterval(function(){placeNow();if(!state.q)renderSide()},60000);
+
+/* ---------- Kết nối Supabase: đăng nhập, phân quyền, dữ liệu dùng chung ---------- */
+var sb=null,me=null,started=false;
+var ROLE={admin:'Quản trị viên',staff:'Nhân viên',viewer:'Chỉ xem'};
+function chk(r){if(r&&r.error)throw new Error(r.error.message);return r}
+function uid(){return window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})}
+function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
+function bookingToRow(id,d){return{id:id,date:d.date,pitch_id:d.pitch,start_min:d.start,end_min:d.end,customer_name:d.name||'',phone:d.phone||'',price:d.price||0,deposit:d.deposit||0,status:d.status||'pending',referee:!!d.referee,note:d.note||'',group_id:d.groupId||null}}
+function makeSbDb(){
+  var bmap={},bl=[],sl=[],cfg={venue:'Đăng Khoa Sport',open_min:300,close_min:1380},pit=[],has=false;
+  function emitB(){bl.slice().forEach(function(f){f()})}
+  function emitS(){sl.slice().forEach(function(f){f()})}
+  async function loadBookings(){
+    var from=0,all=[];
+    for(;;){var r=chk(await sb.from('bookings').select('*').order('date').range(from,from+999));all=all.concat(r.data||[]);if((r.data||[]).length<1000)break;from+=1000}
+    bmap={};all.forEach(function(x){bmap[x.id]=x});emitB();
+  }
+  async function loadSettings(){
+    var a=chk(await sb.from('venue_settings').select('*').eq('id',1).maybeSingle()),p=chk(await sb.from('pitches').select('*').order('sort_order'));
+    has=!!a.data;if(a.data)cfg=a.data;pit=p.data||[];emitS();
+  }
+  function docRef(path){
+    var p=path.split('/');
+    if(p[0]==='settings')return{
+      set:async function(d){
+        chk(await sb.from('venue_settings').upsert({id:1,venue:d.venue,open_min:d.open,close_min:d.close}));
+        var keep=d.pitches.map(function(x){return x.id});
+        chk(await sb.from('pitches').upsert(d.pitches.map(function(x,i){return{id:x.id,name:x.name,type:x.type,price:x.price,sort_order:i}})));
+        var del=pit.filter(function(x){return keep.indexOf(x.id)<0}).map(function(x){return x.id});
+        if(del.length)chk(await sb.from('pitches').delete().in('id',del));
+        await loadSettings();
+      },
+      onSnapshot:function(cb){var f=function(){cb({exists:has||pit.length>0,data:function(){return{venue:cfg.venue,open:cfg.open_min,close:cfg.close_min,pitches:pit.map(function(x){return{id:x.id,name:x.name,type:x.type,price:Number(x.price)||0}})}}})};sl.push(f);f();return function(){}}
+      };
+    var id=p[1];
+    return{
+      set:async function(d){var r=chk(await sb.from('bookings').upsert(bookingToRow(id,d)).select().single());if(r.data){bmap[id]=r.data;emitB()}},
+      delete:async function(){chk(await sb.from('bookings').delete().eq('id',id));delete bmap[id];emitB()}
+    };
+  }
+  return{
+    init:async function(){
+      await loadSettings();await loadBookings();
+      sb.channel('dks-live')
+        .on('postgres_changes',{event:'*',schema:'public',table:'bookings'},function(p){if(p.eventType==='DELETE'){if(p.old)delete bmap[p.old.id]}else if(p.new)bmap[p.new.id]=p.new;emitB()})
+        .on('postgres_changes',{event:'*',schema:'public',table:'pitches'},function(){loadSettings()})
+        .on('postgres_changes',{event:'*',schema:'public',table:'venue_settings'},function(){loadSettings()})
+        .subscribe();
+    },
+    doc:docRef,
+    collection:function(){return{
+      doc:function(id){return docRef('bookings/'+(id||uid()))},
+      where:function(){return this},
+      onSnapshot:function(cb){var f=function(){cb({metadata:{fromCache:false},docs:Object.keys(bmap).map(function(k){return{id:k,data:function(){return rowToBooking(bmap[k])}}})})};bl.push(f);f();return function(){}}
+    }}
+  };
+}
+function authMode(mode,msg){
+  $('#authOverlay').hidden=false;var login=mode==='login';
+  $('#authFields').hidden=!login;$('#aSignup').hidden=!login;$('#aLogin').hidden=!login;$('#aOut').hidden=login;
+  var i=$('#aInfo');i.textContent=msg||'';i.hidden=!msg;$('#aMsg').hidden=true;
+}
+function authErr(e){var m=(e&&e.message)||'';if(/Invalid login/i.test(m))return 'Sai email hoặc mật khẩu.';if(/not confirmed/i.test(m))return 'Email chưa được xác nhận. Hãy kiểm tra hộp thư của bạn.';if(/at least 6|weak/i.test(m))return 'Mật khẩu cần có ít nhất 6 ký tự.';if(/already registered/i.test(m))return 'Email này đã có tài khoản. Hãy bấm Đăng nhập.';return m||'Có lỗi xảy ra, thử lại sau.'}
+async function start(session){
+  if(started)return;
+  var email=((session.user&&session.user.email)||'').toLowerCase();
+  var r=await sb.from('members').select('*').eq('email',email).maybeSingle();
+  if(r.error){authMode('blocked','Không đọc được danh sách thành viên: '+r.error.message+'. Hãy chắc chắn đã chạy setup.sql.');return}
+  if(!r.data){authMode('blocked','Tài khoản '+email+' chưa được cấp quyền. Hãy nhờ quản trị viên thêm email này vào mục Thành viên.');return}
+  started=true;me=r.data;state.canWrite=me.role!=='viewer';state.admin=me.role==='admin';
+  $('#authOverlay').hidden=true;$('#whoami').textContent=(me.full_name||email)+' · '+ROLE[me.role];$('#membersBtn').hidden=!state.admin;
+  db=makeSbDb();
+  try{await db.init()}catch(err){state.note='Không đọc được dữ liệu: '+err.message;renderAll();return}
+  state.dbOn=true;renderAll();
+  db.doc('settings/main').onSnapshot(function(s){
+    if(s.exists){var d=s.data()||{};
+      if(typeof d.venue==='string'&&d.venue)state.venue=d.venue;
+      if(typeof d.open==='number')state.open=d.open;
+      if(typeof d.close==='number')state.close=d.close;
+      if(Array.isArray(d.pitches)&&d.pitches.length)state.pitches=d.pitches}
+    renderAll();
+  });
+  db.collection('bookings').onSnapshot(function(snap){
+    state.bookings=snap.docs.map(function(d){var x=Object.assign({},d.data());x.id=d.id;if(!STATUS[x.status])x.status='pending';return x});
+    state.loaded=true;renderAll();
+    if(!state.firstScroll){state.firstScroll=true;scrollGrid()}
+  });
+}
+function logout(){if(!sb)return;sb.auth.signOut().then(function(){location.reload()})}
+$('#logoutBtn').onclick=logout;$('#aOut').onclick=logout;
+$('#authForm').onsubmit=async function(e){
+  e.preventDefault();if(!sb)return;
+  var em=$('#aEmail').value.trim().toLowerCase(),pw=$('#aPass').value;
+  if(!em||!pw)return showMsg($('#aMsg'),'Nhập email và mật khẩu.');
+  $('#aLogin').disabled=true;$('#aMsg').hidden=true;
+  try{var r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;await start(r.data.session)}
+  catch(err){showMsg($('#aMsg'),authErr(err))}finally{$('#aLogin').disabled=false}
+};
+$('#aSignup').onclick=async function(){
+  if(!sb)return;var em=$('#aEmail').value.trim().toLowerCase(),pw=$('#aPass').value;
+  if(!em||!pw)return showMsg($('#aMsg'),'Nhập email và mật khẩu để tạo tài khoản.');
+  $('#aMsg').hidden=true;
+  try{var r=await sb.auth.signUp({email:em,password:pw});if(r.error)throw r.error;
+    if(r.data.session)await start(r.data.session);
+    else{$('#aInfo').textContent='Đã tạo tài khoản. Nếu hệ thống gửi email xác nhận, hãy bấm vào liên kết trong email rồi đăng nhập. Sau đó nhờ quản trị viên cấp quyền cho email này.';$('#aInfo').hidden=false}}
+  catch(err){showMsg($('#aMsg'),authErr(err))}
+};
+async function loadMembers(){
+  var r=chk(await sb.from('members').select('*').order('created_at')),h='';
+  r.data.forEach(function(m){var self=m.email===me.email;
+    h+='<div class="mrow"><div><b>'+esc(m.full_name||m.email)+(self?' (bạn)':'')+'</b><span>'+esc(m.email)+'</span></div><select class="inp" data-role-of="'+esc(m.email)+'"'+(self?' disabled':'')+'>'
+      +Object.keys(ROLE).map(function(k){return '<option value="'+k+'"'+(k===m.role?' selected':'')+'>'+ROLE[k]+'</option>'}).join('')+'</select>'
+      +'<button type="button" class="btn sm danger" data-mdel="'+esc(m.email)+'"'+(self?' disabled':'')+'>Xoá</button></div>'});
+  $('#mbList').innerHTML=h;
+}
+$('#membersBtn').onclick=async function(){$('#mMsg').hidden=true;$('#mbOverlay').hidden=false;try{await loadMembers()}catch(err){showMsg($('#mMsg'),err.message)}};
+$('#mAdd').onclick=async function(){
+  var em=$('#mEmail').value.trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(em))return showMsg($('#mMsg'),'Nhập đúng địa chỉ email.');
+  try{chk(await sb.from('members').insert({email:em,full_name:$('#mName').value.trim(),role:$('#mRole').value}));$('#mEmail').value='';$('#mName').value='';$('#mMsg').hidden=true;await loadMembers();toast('Đã thêm thành viên.')}
+  catch(err){showMsg($('#mMsg'),/duplicate/i.test(err.message)?'Email này đã có trong danh sách.':err.message)}
+};
+$('#mbList').onchange=async function(e){var em=e.target.dataset.roleOf;if(!em)return;try{chk(await sb.from('members').update({role:e.target.value}).eq('email',em));toast('Đã đổi vai trò.')}catch(err){showMsg($('#mMsg'),err.message);loadMembers()}};
+$('#mbList').onclick=async function(e){var b=e.target.closest('[data-mdel]');if(!b)return;if(!confirm('Xoá '+b.dataset.mdel+' khỏi danh sách thành viên?'))return;try{chk(await sb.from('members').delete().eq('email',b.dataset.mdel));await loadMembers()}catch(err){showMsg($('#mMsg'),err.message)}};
+
+(async function boot(){
+  var cfg=window.APP_CONFIG||{};
+  if(!window.supabase||!cfg.url||/YOUR-/.test(cfg.url)||!cfg.key||/YOUR-/.test(cfg.key)){
+    state.loaded=true;renderAll();authMode('blocked','Chưa cấu hình kết nối. Mở file index.html bằng Notepad, điền Project URL và anon key của Supabase vào dòng APP_CONFIG ở đầu file, rồi lưu lại.');$('#aOut').hidden=true;return}
+  sb=window.supabase.createClient(cfg.url,cfg.key);authMode('login');
+  try{var g=await sb.auth.getSession();if(g.data&&g.data.session)await start(g.data.session)}catch(err){showMsg($('#aMsg'),authErr(err))}
+})();
+})();
+</script>
+</body></html>
