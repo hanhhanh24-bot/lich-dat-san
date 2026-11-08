@@ -280,6 +280,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f span2">Trọng tài<select class="inp" id="fRef"><option value="0">Không</option><option value="1">Có</option></select></label>
 <label class="f span2" id="fDepositWrap" hidden>Tiền đã cọc (đồng)<input class="inp num" id="fDeposit" type="text" inputmode="numeric"></label>
 <label class="f span2" id="fRepeatWrap">Khách đá cố định<select class="inp" id="fRepeat"><option value="0">Chỉ một buổi</option><option value="3">Lặp lại hàng tuần, 4 tuần liên tiếp</option><option value="7">Lặp lại hàng tuần, 8 tuần liên tiếp</option><option value="11">Lặp lại hàng tuần, 12 tuần liên tiếp</option><option value="25">Lặp lại hàng tuần, 26 tuần liên tiếp</option></select></label>
+<div class="f span2" id="bookingAudit" hidden><div>Người nhập lịch — <strong id="bookingCreator"></strong></div><div>Người sửa gần nhất — <strong id="bookingEditor"></strong></div></div>
 <label class="f span2">Ghi chú<input class="inp" id="fNote" type="text" placeholder="Thuê áo bib, nước, trọng tài…"></label>
 </div><div class="remain" id="fRemain"></div>
 <p class="hint"><b>Quy tắc đặt sân:</b> Sân 7 và Sân 5 không được đặt trùng giờ. Sân 5 được đặt tối đa 3 sân cùng một khung giờ.</p><p class="msg" id="fMsg" role="alert" hidden></p></div>
@@ -524,6 +525,9 @@ function renderDel(){
 function openForm(o){
   o=o||{};if(!canEdit()){toast('Bạn chưa có quyền sửa sổ này.');return}
   var b=o.id?bookingById(o.id):null;
+  $('#bookingAudit').hidden=!b;
+  $('#bookingCreator').textContent=b&&b.createdBy||'Chưa ghi nhận';
+  $('#bookingEditor').textContent=b&&b.updatedBy||'Chưa ghi nhận';
   form={id:b?b.id:null,priceTouched:!!b,delStage:0,groupId:b?b.groupId||null:null,created:b?b.createdAt||null:null};
   $('#bkTitle').textContent=b?'Sửa lượt đặt':'Đặt sân mới';$('#saveBtn').textContent=b?'Lưu thay đổi':'Lưu lượt đặt';$('#fMsg').hidden=true;
   var def=b||{date:o.date||state.selected,pitch:o.pitch||(state.pitches[0]&&state.pitches[0].id),start:o.start!=null?o.start:Math.min(Math.max(state.open,1080),state.close-90),end:null,name:'',phone:'',price:0,deposit:0,status:'pending',note:''};
@@ -705,7 +709,7 @@ var sb=null,me=null,started=false;
 var ROLE={admin:'Quản trị viên',staff:'Nhân viên',viewer:'Chỉ xem'};
 function chk(r){if(r&&r.error)throw new Error(r.error.message);return r}
 function uid(){return window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})}
-function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
+function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdBy:r.created_by,updatedBy:r.updated_by,createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
 function bookingToRow(id,d){return{id:id,date:d.date,pitch_id:d.pitch,start_min:d.start,end_min:d.end,customer_name:d.name||'',phone:d.phone||'',price:d.price||0,deposit:d.deposit||0,status:d.status||'pending',referee:!!d.referee,note:d.note||'',group_id:d.groupId||null}}
 function makeSbDb(){
   var bmap={},bl=[],sl=[],cfg={venue:'Đăng Khoa Sport',open_min:300,close_min:1380},pit=[],has=false;
