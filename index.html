@@ -223,7 +223,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
   .band .actions {
     margin-left: 0;
   }
-} </style>
+}
+#bookingAudit { margin-top: 8px; }
+#bookingAudit .audit-row { display: flex; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; }
+#bookingAudit time { margin-left: auto; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+</style>
 <!-- CẤU HÌNH KẾT NỐI: dán Project URL và anon public key của dự án Supabase vào 2 dòng dưới -->
 <script>window.APP_CONFIG={url:'https://qoynnpeytdkcfaedubbk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveW5ucGV5dGRrY2ZhZWR1YmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzY1MDIsImV4cCI6MjEwOTY1MjUwMn0.227EyiIsShCwmTfVVQmTbaZMNw3rBpMAe_gTv0o5dng'};</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -282,7 +286,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f span2" id="fRepeatWrap">Khách đá cố định<select class="inp" id="fRepeat"><option value="0">Chỉ một buổi</option><option value="3">Lặp lại hàng tuần, 4 tuần liên tiếp</option><option value="7">Lặp lại hàng tuần, 8 tuần liên tiếp</option><option value="11">Lặp lại hàng tuần, 12 tuần liên tiếp</option><option value="25">Lặp lại hàng tuần, 26 tuần liên tiếp</option></select></label>
 <label class="f span2">Ghi chú<input class="inp" id="fNote" type="text" placeholder="Thuê áo bib, nước, trọng tài…"></label>
 </div><div class="remain" id="fRemain"></div>
-<div class="f span2" id="bookingAudit" hidden><div>Note: <strong id="bookingCreator"></strong></div><div id="bookingEditorLine" hidden>Chỉnh sửa: <strong id="bookingEditor"></strong></div></div>
+<div class="f span2" id="bookingAudit" hidden><div class="audit-row"><span>Note: <strong id="bookingCreator"></strong></span><time id="bookingCreatedTime"></time></div><div class="audit-row" id="bookingEditorLine" hidden><span>Chỉnh sửa: <strong id="bookingEditor"></strong></span><time id="bookingEditedTime"></time></div></div>
 <p class="msg" id="fMsg" role="alert" hidden></p></div>
 <div class="mfoot"><div id="delArea" class="chips"></div><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="submit" class="btn primary" id="saveBtn">Lưu lượt đặt</button></div>
 </form></div></div>
@@ -526,6 +530,20 @@ function renderDel(){
   a.innerHTML='<button type="button" class="btn danger armed" data-del="2">Bấm lại để xoá</button>'+(later?'<button type="button" class="btn danger" data-del="series">Xoá cả '+later+' tuần sau</button>':'');
 }
 var bookingAuditRequest=0;
+var bookingTimeFormat=new Intl.DateTimeFormat('vi-VN',{
+  timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',hourCycle:'h23',
+  day:'2-digit',month:'2-digit',year:'numeric'
+});
+function renderBookingTime(id,value){
+  var time=$('#'+id), date=new Date(value||NaN);
+  if(Number.isNaN(date.getTime())){
+    time.textContent='';
+    time.removeAttribute('datetime');
+    return;
+  }
+  time.dateTime=date.toISOString();
+  time.textContent=bookingTimeFormat.format(date);
+}
 async function loadBookingNames(booking,request){
   var names=null;
   try{
@@ -541,6 +559,8 @@ function openForm(o){
   var b=o.id?bookingById(o.id):null;
   $('#bookingAudit').hidden=!b;
   $('#bookingEditorLine').hidden=!(b&&b.updatedBy);
+  renderBookingTime('bookingCreatedTime',b&&b.auditCreatedAt);
+  renderBookingTime('bookingEditedTime',b&&b.updatedBy&&b.auditUpdatedAt);
   $('#bookingCreator').textContent=b&&b.createdBy?'Đang tải tên…':'Chưa ghi nhận';
   $('#bookingEditor').textContent=b&&b.updatedBy?'Đang tải tên…':'Chưa ghi nhận';
   var auditRequest=++bookingAuditRequest;
@@ -725,7 +745,7 @@ var sb=null,me=null,started=false;
 var ROLE={admin:'Quản trị viên',staff:'Nhân viên',viewer:'Chỉ xem'};
 function chk(r){if(r&&r.error)throw new Error(r.error.message);return r}
 function uid(){return window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})}
-function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdBy:r.created_by,updatedBy:r.updated_by,createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
+function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdBy:r.created_by,updatedBy:r.updated_by,auditCreatedAt:r.created_at,auditUpdatedAt:r.updated_at,createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
 function bookingToRow(id,d){return{id:id,date:d.date,pitch_id:d.pitch,start_min:d.start,end_min:d.end,customer_name:d.name||'',phone:d.phone||'',price:d.price||0,deposit:d.deposit||0,status:d.status||'pending',referee:!!d.referee,note:d.note||'',group_id:d.groupId||null}}
 function makeSbDb(){
   var bmap={},bl=[],sl=[],cfg={venue:'Đăng Khoa Sport',open_min:300,close_min:1380},pit=[],has=false;
