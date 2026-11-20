@@ -241,7 +241,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <button class="btn icon" id="nextDay" type="button" aria-label="Ngày sau">›</button>
 <button class="btn" id="todayBtn" type="button">Hôm nay</button>
 <input type="date" id="datePick" aria-label="Chọn ngày"></div>
-<div class="actions"><span class="who" id="whoami"></span><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
+<div class="actions"><span class="who" id="whoami"></span><button class="btn" id="archiveBtn" type="button" hidden>Lịch đã xoá</button><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
 </div></header>
 <div class="wrap">
 <div id="banners"></div>
@@ -312,6 +312,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <p class="remain" id="aInfo" hidden></p><p class="msg" id="aMsg" role="alert" hidden></p></div>
 <div class="mfoot"><button type="button" class="btn" id="aSignup">Tạo tài khoản</button><div class="grow"></div><button type="button" class="btn" id="aOut" hidden>Đăng xuất</button><button type="submit" class="btn primary" id="aLogin">Đăng nhập</button></div>
 </form></div></div>
+<div class="overlay" id="archiveOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="archiveTitle">
+<div class="mhead"><h2 id="archiveTitle">Lịch đã xoá</h2><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="mbody" style="max-height:55vh;overflow:auto">
+<label><input type="checkbox" id="archiveAll"> Chọn tất cả</label>
+<div id="archiveList"></div></div>
+<div class="mfoot"><button type="button" class="btn" data-close>Đóng</button><button type="button" class="btn danger" id="purgeBtn" disabled>Xoá vĩnh viễn mục đã chọn</button></div>
+</div></div>
 <div class="overlay" id="mbOverlay" hidden><div class="modal"><div class="mhead"><h2>Thành viên</h2><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
 <div class="mbody"><div id="mbList"></div>
 <h3 style="margin:16px 0 8px;font:600 18px var(--fd);letter-spacing:.04em;text-transform:uppercase">Thêm thành viên</h3>
@@ -398,7 +405,7 @@ function renderBanners(){
   if(!state.dbOn&&state.loaded)h+='<div class="banner warn"><span>Chưa kết nối được dữ liệu. Hãy đăng nhập để tiếp tục.</span></div>';
   else if(state.canWrite===false)h+='<div class="banner"><span>Tài khoản của bạn chỉ có quyền xem. Hãy nhờ quản trị viên cấp vai trò Nhân viên để nhập và sửa lịch.</span></div>';
   if(state.note)h+='<div class="banner warn"><span>'+esc(state.note)+'</span></div>';
-  if(canEdit()&&state.bookings.some(function(b){return b.sample}))h+='<div class="banner"><span>Sổ đang có lượt đặt mẫu để bạn xem thử. Bấm vào từng lượt để sửa, hoặc xoá hết khi bắt đầu dùng thật.</span><button class="btn sm" type="button" id="clearSample">Xoá dữ liệu mẫu</button></div>';
+  if(state.admin&&canEdit()&&state.bookings.some(function(b){return b.sample}))h+='<div class="banner"><span>Sổ đang có lượt đặt mẫu để bạn xem thử. Bấm vào từng lượt để sửa, hoặc xoá hết khi bắt đầu dùng thật.</span><button class="btn sm" type="button" id="clearSample">Xoá dữ liệu mẫu</button></div>';
   if(getRange().from<CUTOFF)h+='<div class="banner warn"><span>Sổ chỉ tải các lượt đặt từ '+dmy(CUTOFF)+' trở lại đây. Ngày này có thể thiếu dữ liệu.</span></div>';
   $('#banners').innerHTML=h;
 }
@@ -527,7 +534,7 @@ function autoPrice(){if(form.priceTouched)return;$('#fPrice').value=curPrice();s
 function renderDel(){
   var a=$('#delArea');if(!form.id){a.innerHTML='';return}
   var later=form.groupId?state.bookings.filter(function(b){return b.groupId===form.groupId&&b.date>$('#fDate').dataset.orig&&b.id!==form.id}).length:0;
-  if(form.delStage===0){a.innerHTML=($('#fStatus').value!=='cancelled'?'<button type="button" class="btn" data-del="cancel">Huỷ lịch</button>':'')+'<button type="button" class="btn danger" data-del="1">Xoá lượt đặt</button>';return}
+  if(form.delStage===0){a.innerHTML=($('#fStatus').value!=='cancelled'?'<button type="button" class="btn" data-del="cancel">Huỷ lịch</button>':'')+(state.admin?'<button type="button" class="btn danger" data-del="1">Xoá lượt đặt</button>':'');return}
   a.innerHTML='<button type="button" class="btn danger armed" data-del="2">Bấm lại để xoá</button>'+(later?'<button type="button" class="btn danger" data-del="series">Xoá cả '+later+' tuần sau</button>':'');
 }
 var bookingAuditRequest=0;
@@ -581,7 +588,7 @@ function openForm(o){
   if(!b)$('#fPrice').value=curPrice();
   syncDur();syncRemain();renderDel();$('#bkOverlay').hidden=false;setTimeout(function(){$('#fName').focus()},30);
 }
-function closeOverlays(){$('#bkOverlay').hidden=true;$('#stOverlay').hidden=true;$('#mbOverlay').hidden=true}
+function closeOverlays(){$('#archiveOverlay').hidden=true;$('#bkOverlay').hidden=true;$('#stOverlay').hidden=true;$('#mbOverlay').hidden=true}
 var MAX_S5=3;
 function pitchKind(id){var p=pitchById(id);return p?String(p.type||'').replace(/\D/g,''):''}
 function findConflict(date,pitch,s,e,ign){
@@ -634,10 +641,14 @@ async function saveBooking(ev){
   finally{btn.disabled=false}
 }
 async function deleteBooking(mode){
+  if(!state.admin||!canEdit())return;
   var msg=$('#fMsg'),orig=$('#fDate').dataset.orig;
   try{
-    if(mode==='series'&&form.groupId){var ids=state.bookings.filter(function(b){return b.groupId===form.groupId&&b.date>=orig}).map(function(b){return b.id});for(var i=0;i<ids.length;i++)await db.doc('bookings/'+ids[i]).delete();toast('Đã xoá '+ids.length+' lượt đặt trong chuỗi.')}
-    else{await db.doc('bookings/'+form.id).delete();toast('Đã xoá lượt đặt.')}
+    var ids=mode==='series'&&form.groupId
+      ?state.bookings.filter(function(b){return b.groupId===form.groupId&&b.date>=orig}).map(function(b){return b.id})
+      :[form.id];
+    await db.archive(ids);
+    toast('Đã chuyển lượt đặt vào danh sách đã xoá.');
     closeOverlays();
   }catch(err){showMsg(msg,'Không xoá được: '+((err&&err.message)||'lỗi không xác định'))}
 }
@@ -647,8 +658,9 @@ async function quickPay(id){
   catch(err){toast('Không cập nhật được: '+((err&&err.message)||'lỗi'))}
 }
 async function clearSample(){
+  if(!state.admin||!canEdit())return;
   var ids=state.bookings.filter(function(b){return b.sample}).map(function(b){return b.id});
-  try{for(var i=0;i<ids.length;i++)await db.doc('bookings/'+ids[i]).delete();toast('Đã xoá '+ids.length+' lượt đặt mẫu.')}
+  try{await db.archive(ids);toast('Đã xoá '+ids.length+' lượt đặt mẫu.')}
   catch(err){toast('Không xoá hết được: '+((err&&err.message)||'lỗi'))}
 }
 
@@ -706,7 +718,7 @@ document.addEventListener('click',function(e){if(e.target.closest('[data-close]'
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){closeOverlays();return}
   var tag=(e.target.tagName||'').toLowerCase();
-  if(!$('#bkOverlay').hidden||!$('#stOverlay').hidden||tag==='input'||tag==='select'||tag==='textarea')return;
+  if(!$('#archiveOverlay').hidden||!$('#bkOverlay').hidden||!$('#stOverlay').hidden||tag==='input'||tag==='select'||tag==='textarea')return;
   if(e.key==='ArrowLeft'&&!$('#prevDay').disabled)shift(-1);
   if(e.key==='ArrowRight')shift(1);
 });
@@ -776,8 +788,7 @@ function makeSbDb(){
       };
     var id=p[1];
     return{
-      set:async function(d){var r=chk(await sb.from('bookings').upsert(bookingToRow(id,d)).select().single());if(r.data){bmap[id]=r.data;emitB()}},
-      delete:async function(){chk(await sb.from('bookings').delete().eq('id',id));delete bmap[id];emitB()}
+      set:async function(d){var r=chk(await sb.from('bookings').upsert(bookingToRow(id,d)).select().single());if(r.data){bmap[id]=r.data;emitB()}}
     };
   }
   return{
@@ -788,6 +799,10 @@ function makeSbDb(){
         .on('postgres_changes',{event:'*',schema:'public',table:'pitches'},function(){loadSettings()})
         .on('postgres_changes',{event:'*',schema:'public',table:'venue_settings'},function(){loadSettings()})
         .subscribe();
+    },
+    archive:async function(ids){
+      chk(await sb.rpc('archive_bookings',{booking_ids:ids}));
+      ids.forEach(function(id){delete bmap[id]});emitB();
     },
     doc:docRef,
     collection:function(){return{
@@ -810,7 +825,7 @@ async function start(session){
   if(r.error){authMode('blocked','Không đọc được danh sách thành viên: '+r.error.message+'. Hãy chắc chắn đã chạy setup.sql.');return}
   if(!r.data){authMode('blocked','Tài khoản '+email+' chưa được cấp quyền. Hãy nhờ quản trị viên thêm email này vào mục Thành viên.');return}
   started=true;me=r.data;state.canWrite=me.role!=='viewer';state.admin=me.role==='admin';
-  $('#authOverlay').hidden=true;$('#whoami').textContent=(me.full_name||email)+' · '+ROLE[me.role];$('#membersBtn').hidden=!state.admin;
+  $('#authOverlay').hidden=true;$('#whoami').textContent=(me.full_name||email)+' · '+ROLE[me.role];$('#membersBtn').hidden=!state.admin;$('#archiveBtn').hidden=!state.admin;
   db=makeSbDb();
   try{await db.init()}catch(err){state.note='Không đọc được dữ liệu: '+err.message;renderAll();return}
   state.dbOn=true;renderAll();
@@ -907,6 +922,47 @@ $('#mbList').onclick=async function(e){
   finally{button.disabled=false}
 };
 
+
+function updateArchiveSelection(){
+  var boxes=Array.from($('#archiveList').querySelectorAll('input[type=checkbox]'));
+  var count=boxes.filter(function(box){return box.checked}).length;
+  $('#archiveAll').disabled=!boxes.length;
+  $('#archiveAll').checked=boxes.length>0&&count===boxes.length;
+  $('#archiveAll').indeterminate=count>0&&count<boxes.length;
+  $('#purgeBtn').disabled=!count;
+}
+async function loadArchive(){
+  $('#archiveList').textContent='Đang tải…';
+  updateArchiveSelection();
+  try{
+    var rows=[];
+    for(var offset=0;;offset+=1000){
+      var page=chk(await sb.from('booking_archive').select('*').order('archived_at',{ascending:false}).order('booking_id').range(offset,offset+999)).data;
+      rows=rows.concat(page);
+      if(page.length<1000)break;
+    }
+    $('#archiveList').innerHTML=rows.map(function(row){
+      var b=rowToBooking(row.booking);
+      return '<div><label><input type="checkbox" value="'+esc(row.booking_id)+'"> <b>'+esc(b.name||'Khách lẻ')+'</b> · '+esc(dmy(b.date))+' · '+esc(pitchName(b.pitch))+' · '+fmtMin(b.start)+'–'+fmtMin(b.end)+' · Xoá lúc '+esc(bookingTimeFormat.format(new Date(row.archived_at)))+'</label></div>';
+    }).join('')||'<p>Chưa có lượt đặt đã xoá.</p>';
+  }catch(err){$('#archiveList').textContent=err.message}
+  updateArchiveSelection();
+}
+$('#archiveBtn').onclick=function(){if(state.admin){$('#archiveOverlay').hidden=false;loadArchive()}};
+$('#archiveList').onchange=updateArchiveSelection;
+$('#archiveAll').onchange=function(){
+  var checked=this.checked;
+  $('#archiveList').querySelectorAll('input[type=checkbox]').forEach(function(box){box.checked=checked});
+  updateArchiveSelection();
+};
+$('#purgeBtn').onclick=async function(){
+  if(!state.admin)return;
+  var ids=Array.from($('#archiveList').querySelectorAll('input:checked')).map(function(box){return box.value});
+  if(!ids.length||!confirm('Xoá vĩnh viễn '+ids.length+' lượt đặt đã chọn?'))return;
+  this.disabled=true;
+  try{chk(await sb.rpc('purge_booking_archive',{booking_ids:ids}));await loadArchive();toast('Đã xoá vĩnh viễn các lượt đã chọn.')}
+  catch(err){toast(err.message);updateArchiveSelection()}
+};
 
 (async function boot(){
   var cfg=window.APP_CONFIG||{};
