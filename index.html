@@ -239,9 +239,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <div class="datenav"><button class="btn icon" id="prevDay" type="button" aria-label="Ngày trước">‹</button>
 <div class="datecur"><span class="big" id="dateBig"></span><span class="sub" id="dateSub"></span></div>
 <button class="btn icon" id="nextDay" type="button" aria-label="Ngày sau">›</button>
-<button class="btn" id="todayBtn" type="button">Hôm nay</button>
+<div style="display:flex;gap:6px;align-items:center;white-space:nowrap"><button class="btn" id="todayBtn" type="button">Hôm nay</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
 <input type="date" id="datePick" aria-label="Chọn ngày"></div>
-<div class="actions"><span class="who" id="whoami"></span><button class="btn" id="archiveBtn" type="button" hidden>Lịch đã xoá</button><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
+<div class="actions"><span class="who" id="whoami"></span><button class="btn" id="archiveBtn" type="button" hidden>Lịch đã xoá</button><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button></div>
 </div></header>
 <div class="wrap">
 <div id="banners"></div>
@@ -279,9 +279,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f">Giờ bắt đầu<select class="inp" id="fStart"></select></label>
 <label class="f">Giờ kết thúc<select class="inp" id="fEnd"></select></label>
 <div class="f span2"><span>Thời lượng</span><output class="dur" id="durText" for="fStart fEnd"></output></div>
-<label class="f">Tiền sân (đồng)<input class="inp num" id="fPrice" type="text" inputmode="numeric"></label>
+<label class="f">Tiền sân trước giảm (đồng)<input class="inp num" id="fPrice" type="text" inputmode="numeric"></label>
 <label class="f">Trạng thái<select class="inp" id="fStatus"></select></label>
 <label class="f span2">Trọng tài<select class="inp" id="fRef"><option value="0">Không</option><option value="1">Có</option></select></label>
+<fieldset class="span2" style="min-width:0;border:0;padding:0;margin:0">
+<legend style="font-weight:600;margin-bottom:6px">Khuyến mãi</legend>
+<div class="fgrid">
+<label class="f">Giảm (%)<input class="inp" id="fDiscountPercent" type="number" inputmode="decimal" min="0" max="100" step="0.01"></label>
+<label class="f">Số tiền giảm (đồng)<input class="inp num" id="fDiscountAmount" type="text" inputmode="numeric"></label>
+</div>
+</fieldset>
 <label class="f span2" id="fDepositWrap" hidden>Tiền đã cọc (đồng)<input class="inp num" id="fDeposit" type="text" inputmode="numeric"></label>
 <label class="f span2" id="fRepeatWrap">Khách đá cố định<select class="inp" id="fRepeat"><option value="0">Chỉ một buổi</option><option value="3">Lặp lại hàng tuần, 4 tuần liên tiếp</option><option value="7">Lặp lại hàng tuần, 8 tuần liên tiếp</option><option value="11">Lặp lại hàng tuần, 12 tuần liên tiếp</option><option value="25">Lặp lại hàng tuần, 26 tuần liên tiếp</option></select></label>
 <label class="f span2">Ghi chú<input class="inp" id="fNote" type="text" placeholder="Thuê áo bib, nước, trọng tài…"></label>
@@ -299,7 +306,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <label class="f">Giờ mở cửa<select class="inp" id="sOpen"></select></label>
 <label class="f">Giờ đóng cửa<select class="inp" id="sClose"></select></label></div>
 <h3 style="margin:18px 0 8px;font:600 18px var(--fd);letter-spacing:.04em;text-transform:uppercase">Danh sách sân</h3>
-<div class="plabel"><span>Tên sân</span><span>Loại sân</span><span>Giá mỗi giờ</span><span></span></div>
+<div class="plabel"><span>Tên sân</span><span>Loại sân</span><span>Giá sân (đồng)</span><span></span></div>
 <div id="pitchRows"></div><button type="button" class="btn sm" id="addPitch">+ Thêm sân</button>
 <p class="msg" id="sMsg" role="alert" hidden></p></div>
 <div class="mfoot"><div class="grow"></div><button type="button" class="btn" data-close>Đóng</button><button type="submit" class="btn primary" id="sSave">Lưu cài đặt</button></div>
@@ -524,12 +531,30 @@ function setDate(s,ns){if(!s)return;state.selected=s;renderAll();if(!ns)scrollGr
 
 var form={id:null,priceTouched:false,delStage:0,groupId:null,created:null};
 function timeOpts(from,to,cur){var h='',seen=false;for(var m=from;m<=to;m+=30){h+='<option value="'+m+'"'+(m===cur?' selected':'')+'>'+fmtMin(m)+'</option>';if(m===cur)seen=true}if(!seen&&cur!=null)h+='<option value="'+cur+'" selected>'+fmtMin(cur)+'</option>';return h}
-function curPrice(){var p=pitchById($('#fPitch').value),m=Number($('#fEnd').value)-Number($('#fStart').value);return p&&m>0?Math.round(p.price*m/60):0}
+function curPrice(){var p=pitchById($('#fPitch').value);return p?p.price:0}
+function readDiscount(){
+  var gross=digits($('#fPrice').value);
+  if(form.discountMode==='percent'){
+    var percent=Number($('#fDiscountPercent').value)||0;
+    return {gross:gross,amount:Math.round(gross*Math.min(100,Math.max(0,percent))/100),percent:percent};
+  }
+  return {gross:gross,amount:digits($('#fDiscountAmount').value),percent:null};
+}
+function netPrice(){var d=readDiscount();return Math.max(0,d.gross-d.amount)}
+function syncDiscount(){
+  var d=readDiscount();
+  if(form.discountMode==='percent'){
+    $('#fDiscountAmount').value=d.amount?fmtNum(d.amount):'';
+  }else{
+    $('#fDiscountPercent').value=d.gross&&d.amount<=d.gross&&d.amount
+      ?Math.round(d.amount/d.gross*10000)/100:'';
+  }
+}
 function syncDur(){
   var minutes=Number($('#fEnd').value)-Number($('#fStart').value);
   $('#durText').textContent=minutes>0?durText(minutes):'Giờ kết thúc phải sau giờ bắt đầu';
 }
-function syncRemain(){fmtInputs();var price=digits($('#fPrice').value),st=$('#fStatus').value,dep=digits($('#fDeposit').value),got=st==='paid'?price:st==='deposit'?Math.min(dep,price):0,left=st==='cancelled'?0:price-got;$('#fRemain').innerHTML='<span>Đã thu <b>'+money(got)+'</b></span><span>Còn phải thu <b>'+money(left)+'</b></span>';$('#fDepositWrap').hidden=st!=='deposit'}
+function syncRemain(){fmtInputs();syncDiscount();var price=netPrice(),st=$('#fStatus').value,dep=digits($('#fDeposit').value),got=st==='paid'?price:st==='deposit'?Math.min(dep,price):0,left=st==='cancelled'?0:price-got;$('#fRemain').innerHTML='<span>Đã thu <b>'+money(got)+'</b></span><span>Còn phải thu <b>'+money(left)+'</b></span>';$('#fDepositWrap').hidden=st!=='deposit'}
 function autoPrice(){if(form.priceTouched)return;$('#fPrice').value=curPrice();syncRemain()}
 function renderDel(){
   var a=$('#delArea');if(!form.id){a.innerHTML='';return}
@@ -573,7 +598,7 @@ function openForm(o){
   $('#bookingEditor').textContent=b&&b.updatedBy?'Đang tải tên…':'Chưa ghi nhận';
   var auditRequest=++bookingAuditRequest;
   if(b) loadBookingNames(b,auditRequest);
-  form={id:b?b.id:null,priceTouched:!!b,delStage:0,groupId:b?b.groupId||null:null,created:b?b.createdAt||null:null};
+  form={id:b?b.id:null,priceTouched:!!b,discountMode:b&&b.discountPercent!=null?'percent':'amount',delStage:0,groupId:b?b.groupId||null:null,created:b?b.createdAt||null:null};
   $('#bkTitle').textContent=b?'Sửa lượt đặt':'Đặt sân mới';$('#saveBtn').textContent=b?'Lưu thay đổi':'Lưu lượt đặt';$('#fMsg').hidden=true;
   var def=b||{date:o.date||state.selected,pitch:o.pitch||(state.pitches[0]&&state.pitches[0].id),start:o.start!=null?o.start:Math.min(Math.max(state.open,1080),state.close-90),end:null,name:'',phone:'',price:0,deposit:0,status:'pending',note:''};
   if(def.end==null)def.end=Math.min(def.start+90,state.close);
@@ -583,7 +608,9 @@ function openForm(o){
   $('#fDate').value=def.date;$('#fDate').dataset.orig=def.date;
   $('#fStart').innerHTML=timeOpts(state.open,state.close-30,def.start);$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,def.end);
   $('#fStatus').innerHTML=Object.keys(STATUS).map(function(k){return '<option value="'+k+'"'+(k===def.status?' selected':'')+'>'+STATUS[k]+'</option>'}).join('');
-  $('#fPrice').value=b?def.price:'';$('#fDeposit').value=def.deposit||'';$('#fNote').value=def.note||'';
+  $('#fPrice').value=b?def.price+def.discountAmount:'';
+  $('#fDiscountPercent').value=b&&b.discountPercent!=null?b.discountPercent:'';
+  $('#fDiscountAmount').value=b&&b.discountAmount?def.discountAmount:'';$('#fDeposit').value=def.deposit||'';$('#fNote').value=def.note||'';
   $('#fRepeat').value='0';$('#fRepeatWrap').hidden=!!b;$('#fRef').value=def.referee?'1':'0';
   if(!b)$('#fPrice').value=curPrice();
   syncDur();syncRemain();renderDel();$('#bkOverlay').hidden=false;setTimeout(function(){$('#fName').focus()},30);
@@ -613,11 +640,14 @@ async function saveBooking(ev){
   var date=$('#fDate').value,pitch=$('#fPitch').value,start=Number($('#fStart').value),end=Number($('#fEnd').value);
   if(!date)return showMsg(msg,'Chọn ngày đá.');
   if(!(end>start))return showMsg(msg,'Giờ kết thúc phải sau giờ bắt đầu.');
-  var price=digits($('#fPrice').value),status=$('#fStatus').value,dep=digits($('#fDeposit').value);
+  var discount=readDiscount();
+  if(!$('#fDiscountPercent').validity.valid)return showMsg(msg,'Nhập mức giảm từ 0 đến 100%, tối đa hai chữ số thập phân.');
+  if(discount.amount>discount.gross)return showMsg(msg,'Số tiền giảm không được vượt quá tiền sân.');
+  var price=discount.gross-discount.amount,status=$('#fStatus').value,dep=digits($('#fDeposit').value);
   if(status==='paid')dep=price;
   if(status==='deposit'&&dep<=0)return showMsg(msg,'Nhập số tiền khách đã cọc, hoặc chọn trạng thái Giữ chỗ.');
   if(status!=='deposit'&&status!=='paid')dep=0;
-  var base={pitch:pitch,start:start,end:end,name:$('#fName').value.trim(),phone:$('#fPhone').value.trim(),price:price,deposit:dep,status:status,note:$('#fNote').value.trim(),referee:$('#fRef').value==='1'};
+  var base={pitch:pitch,start:start,end:end,name:$('#fName').value.trim(),phone:$('#fPhone').value.trim(),price:price,discountAmount:discount.amount,discountPercent:discount.percent,deposit:dep,status:status,note:$('#fNote').value.trim(),referee:$('#fRef').value==='1'};
   var btn=$('#saveBtn');btn.disabled=true;
   try{
     if(form.id){
@@ -667,7 +697,7 @@ async function clearSample(){
 var draft=[];
 function hourOpts(from,to,cur){var h='';for(var m=from;m<=to;m+=60)h+='<option value="'+m+'"'+(m===cur?' selected':'')+'>'+fmtMin(m)+'</option>';return h}
 function renderPitchRows(){
-  $('#pitchRows').innerHTML=draft.map(function(p,i){return '<div class="prow" data-i="'+i+'"><input class="inp pn" type="text" value="'+esc(p.name)+'" data-f="name" aria-label="Tên sân"><input class="inp" type="text" value="'+esc(p.type||'')+'" data-f="type" placeholder="Sân 7" aria-label="Loại sân"><input class="inp num" type="text" inputmode="numeric" value="'+(p.price||'')+'" data-f="price" placeholder="500.000" aria-label="Giá mỗi giờ"><button type="button" class="btn sm danger" data-rm="'+i+'">Xoá</button></div>'}).join('');fmtInputs();
+  $('#pitchRows').innerHTML=draft.map(function(p,i){return '<div class="prow" data-i="'+i+'"><input class="inp pn" type="text" value="'+esc(p.name)+'" data-f="name" aria-label="Tên sân"><input class="inp" type="text" value="'+esc(p.type||'')+'" data-f="type" placeholder="Sân 7" aria-label="Loại sân"><input class="inp num" type="text" inputmode="numeric" value="'+(p.price||'')+'" data-f="price" placeholder="500.000" aria-label="Giá sân (đồng)"><button type="button" class="btn sm danger" data-rm="'+i+'">Xoá</button></div>'}).join('');fmtInputs();
 }
 function openSettings(){
   if(!canEdit()||!state.admin)return;
@@ -724,11 +754,13 @@ document.addEventListener('keydown',function(e){
 });
 $('#bkForm').onsubmit=saveBooking;
 $('#fPitch').onchange=autoPrice;
-$('#fStart').onchange=function(){var s=Number($('#fStart').value),e=Number($('#fEnd').value);if(e<=s)$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(s+90,state.close));syncDur();autoPrice()};
-$('#fEnd').onchange=function(){syncDur();autoPrice()};
+$('#fStart').onchange=function(){var s=Number($('#fStart').value),e=Number($('#fEnd').value);if(e<=s)$('#fEnd').innerHTML=timeOpts(state.open+30,state.close,Math.min(s+90,state.close));syncDur()};
+$('#fEnd').onchange=function(){syncDur()};
 $('#fPrice').oninput=function(){form.priceTouched=true;syncRemain()};
+$('#fDiscountPercent').oninput=function(){form.discountMode='percent';syncRemain()};
+$('#fDiscountAmount').oninput=function(){form.discountMode='amount';syncRemain()};
 $('#fDeposit').oninput=syncRemain;
-$('#fStatus').onchange=function(){if($('#fStatus').value==='deposit'&&!digits($('#fDeposit').value))$('#fDeposit').value=Math.round(digits($('#fPrice').value)*0.3/10000)*10000||'';syncRemain()};
+$('#fStatus').onchange=function(){if($('#fStatus').value==='deposit'&&!digits($('#fDeposit').value))$('#fDeposit').value=Math.round(netPrice()*0.3/10000)*10000||'';syncRemain()};
 $('#delArea').onclick=function(e){var b=e.target.closest('[data-del]');if(!b)return;var v=b.dataset.del;if(v==='1'){form.delStage=1;renderDel()}else if(v==='2')deleteBooking('one');else if(v==='series')deleteBooking('series');else if(v==='cancel'){$('#fStatus').value='cancelled';syncRemain();$('#bkForm').requestSubmit()}};
 $('#stForm').onsubmit=saveSettings;
 $('#addPitch').onclick=function(){if(draft.length>=8){showMsg($('#sMsg'),'Tối đa 8 sân.');return}draft.push({id:'p'+Date.now().toString(36),name:'Sân '+(draft.length+1),type:'Sân 7',price:500000});renderPitchRows()};
@@ -758,8 +790,8 @@ var sb=null,me=null,started=false;
 var ROLE={admin:'Quản trị viên',staff:'Nhân viên',viewer:'Chỉ xem'};
 function chk(r){if(r&&r.error)throw new Error(r.error.message);return r}
 function uid(){return window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})}
-function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdBy:r.created_by,updatedBy:r.updated_by,auditCreatedAt:r.created_at,auditUpdatedAt:r.updated_at,createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
-function bookingToRow(id,d){return{id:id,date:d.date,pitch_id:d.pitch,start_min:d.start,end_min:d.end,customer_name:d.name||'',phone:d.phone||'',price:d.price||0,deposit:d.deposit||0,status:d.status||'pending',referee:!!d.referee,note:d.note||'',group_id:d.groupId||null}}
+function rowToBooking(r){var o={date:r.date,pitch:r.pitch_id,start:r.start_min,end:r.end_min,name:r.customer_name||'',phone:r.phone||'',price:Number(r.price)||0,discountAmount:Number(r.discount_amount)||0,discountPercent:r.discount_percent==null?null:Number(r.discount_percent),deposit:Number(r.deposit)||0,status:r.status,referee:!!r.referee,note:r.note||'',createdBy:r.created_by,updatedBy:r.updated_by,auditCreatedAt:r.created_at,auditUpdatedAt:r.updated_at,createdAt:Date.parse(r.created_at)||Date.now()};if(r.group_id)o.groupId=r.group_id;return o}
+function bookingToRow(id,d){return{id:id,date:d.date,pitch_id:d.pitch,start_min:d.start,end_min:d.end,customer_name:d.name||'',phone:d.phone||'',price:d.price||0,discount_amount:d.discountAmount||0,discount_percent:d.discountPercent??null,deposit:d.deposit||0,status:d.status||'pending',referee:!!d.referee,note:d.note||'',group_id:d.groupId||null}}
 function makeSbDb(){
   var bmap={},bl=[],sl=[],cfg={venue:'Đăng Khoa Sport',open_min:300,close_min:1380},pit=[],has=false;
   function emitB(){bl.slice().forEach(function(f){f()})}
