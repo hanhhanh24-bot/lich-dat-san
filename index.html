@@ -21,7 +21,7 @@ button,input,select{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .wrap{max-width:none;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px))}
 .num{font-variant-numeric:tabular-nums}
-.band{position:relative;background:var(--band);color:var(--band-ink);overflow:hidden}
+.band{position:sticky;top:0;z-index:20;background:var(--band);color:var(--band-ink);overflow:hidden}
 .band-art{position:absolute;right:-30px;top:0;height:100%;width:520px;max-width:70%;opacity:.13;pointer-events:none}
 .band-in{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;padding-block:20px}
 .brand{min-width:0;flex:1 1 100%;text-align:center;padding-top:4px}
@@ -198,9 +198,27 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 }
 
 .band #addBtn {
-  background: #218653;
-  border-color: #218653;
-  color: #fff;
+  background: #ffd867;
+  border-color: #ffd867;
+  color: #14291e;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.band #addBtn:hover:not(:disabled) {
+  background: #ffe899;
+  border-color: #ffe899;
+}
+.date-booking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bk-referee {
+  color: #a81324;
+  background: #fff0ee;
+  border-radius: 3px;
+  padding: 0 3px;
+  font-weight: 800;
 }
 
 /* Dành thêm chỗ cho bảng lịch trên máy tính */
@@ -239,8 +257,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;op
 <div class="datenav"><button class="btn icon" id="prevDay" type="button" aria-label="Ngày trước">‹</button>
 <div class="datecur"><span class="big" id="dateBig"></span><span class="sub" id="dateSub"></span></div>
 <button class="btn icon" id="nextDay" type="button" aria-label="Ngày sau">›</button>
-<div style="display:flex;gap:6px;align-items:center;white-space:nowrap"><button class="btn" id="todayBtn" type="button">Hôm nay</button><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
-<input type="date" id="datePick" aria-label="Chọn ngày"></div>
+<button class="btn" id="todayBtn" type="button">Hôm nay</button>
+<div class="date-booking"><input type="date" id="datePick" aria-label="Chọn ngày"><button class="btn chalk" id="addBtn" type="button">+ Đặt sân</button></div>
+</div>
 <div class="actions"><span class="who" id="whoami"></span><button class="btn" id="archiveBtn" type="button" hidden>Lịch đã xoá</button><button class="btn" id="membersBtn" type="button" hidden>Thành viên</button><button class="btn" id="logoutBtn" type="button">Đăng xuất</button><button class="btn" id="settingsBtn" type="button">Cài đặt sân</button></div>
 </div></header>
 <div class="wrap">
@@ -440,7 +459,7 @@ function renderGrid(){
     var bl='';
     layoutDay(dayBookings(s,true)).forEach(function(x){var b=x.b;
       var top=(b.start-state.open)/60*ROW,h=Math.max((b.end-b.start)/60*ROW-2,24);
-      bl+='<button type="button" class="bk k'+(pitchKind(b.pitch)||'x')+' s-'+b.status+'" data-id="'+b.id+'" style="top:'+(top+1)+'px;height:'+h+'px;left:calc('+(x.lane*100/x.n)+'% + 2px);width:calc('+(100/x.n)+'% - 4px)" title="'+esc((b.name||'Khách lẻ')+' · '+fmtMin(b.start)+'–'+fmtMin(b.end)+' · '+pitchName(b.pitch)+' · '+STATUS[b.status])+'"><span class="bk-t">'+esc(b.name||'Khách lẻ')+'</span><span class="bk-m">'+fmtMin(b.start)+'–'+fmtMin(b.end)+'</span>'+'<span class="bk-p">'+esc(pitchName(b.pitch))+(b.referee?' · Trọng tài':'')+'</span>'+((h>=70&&x.n<3)||b.status==='cancelled'?'<span class="bk-s">'+STATUS[b.status]+'</span>':'')+'</button>';
+      bl+='<button type="button" class="bk k'+(pitchKind(b.pitch)||'x')+' s-'+b.status+'" data-id="'+b.id+'" style="top:'+(top+1)+'px;height:'+h+'px;left:calc('+(x.lane*100/x.n)+'% + 2px);width:calc('+(100/x.n)+'% - 4px)" title="'+esc((b.name||'Khách lẻ')+' · '+fmtMin(b.start)+'–'+fmtMin(b.end)+' · '+pitchName(b.pitch)+' · '+STATUS[b.status])+'"><span class="bk-t">'+esc(b.name||'Khách lẻ')+'</span><span class="bk-m">'+fmtMin(b.start)+'–'+fmtMin(b.end)+'</span>'+'<span class="bk-p">'+esc(pitchName(b.pitch))+(b.referee?' · <strong class="bk-referee">Trọng tài</strong>':'')+'</span>'+((h>=70&&x.n<3)||b.status==='cancelled'?'<span class="bk-s">'+STATUS[b.status]+'</span>':'')+'</button>';
     });
     cols+='<div class="gcol" data-date="'+s+'" style="height:'+H+'px">'+ph+bl+(s===t?'<div class="now"></div>':'')+'</div>';
   });
